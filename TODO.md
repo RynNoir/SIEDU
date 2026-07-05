@@ -4,7 +4,7 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: Fase 0 selesai (2026-07-05) — Laravel 13 + MySQL (`siedu`), Laravel Breeze (Blade stack) terpasang, Tailwind v4 + design token GUIDELINE.md aktif, font Space Grotesk/IBM Plex ter-import, `config/evaluation.php` dibuat. Belum ada migration domain (12 tabel PRD), hanya migration bawaan (`users`, `cache`, `jobs`) + tabel Breeze (`password_reset_tokens`, `sessions`). Siap lanjut ke Fase 1.
+**Status project saat ini**: Fase 0 & Fase 1 selesai (2026-07-05). Fase 0: Laravel 13 + MySQL (`siedu`), Laravel Breeze (Blade stack) terpasang, Tailwind v4 + design token GUIDELINE.md aktif, font Space Grotesk/IBM Plex ter-import, `config/evaluation.php` dibuat. Fase 1: seluruh 12 migration tabel domain PRD sudah dibuat (1 commit per tabel), `php artisan migrate` sukses, FK & unique constraint terverifikasi via `information_schema`. Siap lanjut ke Fase 2 (Models & Relationships).
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -46,20 +46,20 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 Buat via `php artisan make:migration --no-interaction`. Perhatikan **urutan** karena FK. Gunakan `foreignId()->constrained()`.
 
-- [ ] `study_programs`: `name`, `code` (string 10), `degree_level` enum('D3','D4'), `total_semesters` tinyint. *(Migration paling awal — tidak ada FK.)*
-- [ ] Extend/ubah migration `users`: tambah `role` enum('admin','lecturer','student','kaprodi'), `must_change_password` boolean default true, `study_program_id` **nullable** FK → `study_programs` (dipakai khusus saat `role=kaprodi`, lihat Fase 9). *(Edit migration users bawaan, bukan bikin baru.)*
-- [ ] `class_groups`: FK `study_program_id`, `academic_year` (string 9), `year_level` tinyint, `class_letter` (string 1), `class_code` (string 10), `capacity` int default 25. **Unique** (`academic_year`, `class_code`).
-- [ ] `courses`: FK `study_program_id`, `name`, `code` (string 20), `semester` tinyint, `credit_hours` tinyint.
-- [ ] `lecturers`: FK `user_id`, `name`, `nip` unique, FK `study_program_id` (homebase).
-- [ ] `students`: FK `user_id`, `nim` unique, `name`, FK `study_program_id`, FK `class_group_id`, `current_semester` tinyint, `status` enum('aktif','cuti','DO','lulus') default 'aktif', FK `created_by` → users.
-- [ ] `evaluation_periods`: `name`, `academic_year` (string 9), `semester_type` enum('ganjil','genap'), `start_date` date, `end_date` date, `status` enum('draft','open','closed') default 'draft'.
-- [ ] `evaluation_questions`: `category` string, `question_text` text, `order_number` int, `is_active` boolean default true.
-- [ ] `course_class_assignments`: FK `course_id`, `lecturer_id`, `class_group_id`, `evaluation_period_id`, `created_by` → users. **Unique** (`course_id`, `lecturer_id`, `class_group_id`, `evaluation_period_id`) — v1.1 team teaching.
-- [ ] `evaluations`: FK `student_id`, `course_class_assignment_id`, `evaluation_period_id`, `submitted_at` timestamp. **Unique** (`student_id`, `course_class_assignment_id`, `evaluation_period_id`).
-- [ ] `evaluation_answers`: FK `evaluation_id`, `evaluation_question_id`, `star_rating` tinyint.
-- [ ] `evaluation_impressions`: FK `evaluation_id` **unique**, `impression_text` text nullable, `suggestion_text` text nullable.
-- [ ] Tambah index pada kolom FK yang sering difilter (`evaluations.course_class_assignment_id`, dsb.) — indexing standar cukup (PRD §8).
-- [ ] `php artisan migrate` sukses tanpa error; verifikasi dengan `database-schema`.
+- [x] `study_programs`: `name`, `code` (string 10), `degree_level` enum('D3','D4'), `total_semesters` tinyint. *(Migration paling awal — tidak ada FK.)*
+- [x] Extend/ubah migration `users`: tambah `role` enum('admin','lecturer','student','kaprodi'), `must_change_password` boolean default true, `study_program_id` **nullable** FK → `study_programs` (dipakai khusus saat `role=kaprodi`, lihat Fase 9). *(Edit migration users bawaan, bukan bikin baru.)*
+- [x] `class_groups`: FK `study_program_id`, `academic_year` (string 9), `year_level` tinyint, `class_letter` (string 1), `class_code` (string 10), `capacity` int default 25. **Unique** (`academic_year`, `class_code`).
+- [x] `courses`: FK `study_program_id`, `name`, `code` (string 20), `semester` tinyint, `credit_hours` tinyint.
+- [x] `lecturers`: FK `user_id`, `name`, `nip` unique, FK `study_program_id` (homebase).
+- [x] `students`: FK `user_id`, `nim` unique, `name`, FK `study_program_id`, FK `class_group_id`, `current_semester` tinyint, `status` enum('aktif','cuti','DO','lulus') default 'aktif', FK `created_by` → users.
+- [x] `evaluation_periods`: `name`, `academic_year` (string 9), `semester_type` enum('ganjil','genap'), `start_date` date, `end_date` date, `status` enum('draft','open','closed') default 'draft'.
+- [x] `evaluation_questions`: `category` string, `question_text` text, `order_number` int, `is_active` boolean default true.
+- [x] `course_class_assignments`: FK `course_id`, `lecturer_id`, `class_group_id`, `evaluation_period_id`, `created_by` → users. **Unique** (`course_id`, `lecturer_id`, `class_group_id`, `evaluation_period_id`) — v1.1 team teaching.
+- [x] `evaluations`: FK `student_id`, `course_class_assignment_id`, `evaluation_period_id`, `submitted_at` timestamp. **Unique** (`student_id`, `course_class_assignment_id`, `evaluation_period_id`).
+- [x] `evaluation_answers`: FK `evaluation_id`, `evaluation_question_id`, `star_rating` tinyint.
+- [x] `evaluation_impressions`: FK `evaluation_id` **unique**, `impression_text` text nullable, `suggestion_text` text nullable.
+- [x] Tambah index pada kolom FK yang sering difilter (`evaluations.course_class_assignment_id`, dsb.) — otomatis ter-index via `foreignId()->constrained()` (indexing standar, PRD §8).
+- [x] `php artisan migrate` sukses tanpa error; diverifikasi manual via `information_schema` (MCP `database-schema` tidak tersedia di sesi ini) — 20 FK dan seluruh unique constraint (termasuk 4 kolom team teaching & 3 kolom anti-submit-ganda) terkonfirmasi benar.
 
 ---
 
