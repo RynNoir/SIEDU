@@ -4,7 +4,7 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: Laravel 13 skeleton fresh (PHP 8.5, Pest 4, Pint, Tailwind 4). Belum ada starter kit auth, belum ada migration domain, hanya migration bawaan (`users`, `cache`, `jobs`).
+**Status project saat ini**: Fase 0 selesai (2026-07-05) — Laravel 13 + MySQL (`siedu`), Laravel Breeze (Blade stack) terpasang, Tailwind v4 + design token GUIDELINE.md aktif, font Space Grotesk/IBM Plex ter-import, `config/evaluation.php` dibuat. Belum ada migration domain (12 tabel PRD), hanya migration bawaan (`users`, `cache`, `jobs`) + tabel Breeze (`password_reset_tokens`, `sessions`). Siap lanjut ke Fase 1.
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -30,15 +30,15 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 ## Fase 0 — Persiapan Lingkungan
 
-- [ ] Konfigurasi `.env`: set `DB_CONNECTION=mysql`, `DB_DATABASE=siedu` (atau nama sesuai konvensi lokal), kredensial DB MySQL/MariaDB. Update `config/database.php` default connection bila perlu.
-- [ ] Jalankan `php artisan key:generate` bila belum.
-- [ ] Buat database MySQL kosong, jalankan `php artisan migrate` untuk verifikasi koneksi.
-- [ ] Install **Laravel Breeze (Blade stack)**: `composer require laravel/breeze --dev` → `php artisan breeze:install blade --no-interaction` → `npm install && npm run build`.
-- [ ] Update branding: nama aplikasi **SIEDU** di `.env` (`APP_NAME="SIEDU"`), layout Breeze (`resources/views/layouts`), title halaman login.
-- [ ] Instal Tailwind (sudah v4 di project, terbawa dari Breeze scaffold) — pastikan `npm run dev` jalan.
-- [ ] **Setup design token (GUIDELINE.md §2, §3, §7, §11)**: tambahkan blok `@theme` di `resources/css/app.css` (Tailwind v4, CSS-based config, bukan `tailwind.config.js`) berisi semua CSS custom property dari GUIDELINE.md §11 (`--color-ink`, `--color-canvas`, `--color-surface`, `--color-border`, `--color-accent`, `--color-accent-soft`, `--color-rating`, `--color-success`, `--color-warning`, `--color-danger`, `--color-muted`, radius, spacing).
-- [ ] **Import font (GUIDELINE.md §3.1)**: tambahkan Google Fonts *Space Grotesk*, *IBM Plex Sans*, *IBM Plex Mono* via `<link>` di layout utama (atau self-host via npm bila lebih disukai), map ke `--font-display`, `--font-body`, `--font-mono`.
-- [ ] Buat `config/evaluation.php` untuk nilai configurable: `anonymity_min_respondents` (default 5), `default_password` (default `"password"`).
+- [x] Konfigurasi `.env`: set `DB_CONNECTION=mysql`, `DB_DATABASE=siedu` (atau nama sesuai konvensi lokal), kredensial DB MySQL/MariaDB. Update `config/database.php` default connection bila perlu.
+- [x] Jalankan `php artisan key:generate` bila belum.
+- [x] Buat database MySQL kosong, jalankan `php artisan migrate` untuk verifikasi koneksi.
+- [x] Install **Laravel Breeze (Blade stack)**: `composer require laravel/breeze --dev` → `php artisan breeze:install blade --no-interaction` → `npm install && npm run build`. **Catatan**: `breeze:install blade` men-downgrade Tailwind ke v3 (`tailwind.config.js`/`postcss.config.js` + `@tailwind` directives) — dikembalikan manual ke v4 (`@tailwindcss/vite`, `@import 'tailwindcss'` di `app.css`, hapus config JS v3).
+- [x] Update branding: nama aplikasi **SIEDU** di `.env` (`APP_NAME="SIEDU"`), layout Breeze (`resources/views/layouts`), title halaman login.
+- [x] Instal Tailwind (sudah v4 di project, terbawa dari Breeze scaffold) — pastikan `npm run dev` jalan.
+- [x] **Setup design token (GUIDELINE.md §2, §3, §7, §11)**: tambahkan blok `@theme` di `resources/css/app.css` (Tailwind v4, CSS-based config, bukan `tailwind.config.js`) berisi semua CSS custom property dari GUIDELINE.md §11 (`--color-ink`, `--color-canvas`, `--color-surface`, `--color-border`, `--color-accent`, `--color-accent-soft`, `--color-rating`, `--color-success`, `--color-warning`, `--color-danger`, `--color-muted`, radius, spacing).
+- [x] **Import font (GUIDELINE.md §3.1)**: tambahkan Google Fonts *Space Grotesk*, *IBM Plex Sans*, *IBM Plex Mono* via `<link>` di layout utama (atau self-host via npm bila lebih disukai), map ke `--font-display`, `--font-body`, `--font-mono`.
+- [x] Buat `config/evaluation.php` untuk nilai configurable: `anonymity_min_respondents` (default 5), `default_password` (default `"password"`).
 
 ---
 

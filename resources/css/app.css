@@ -1,9 +1,41 @@
 @import 'tailwindcss';
 
+@plugin '@tailwindcss/forms';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Warna Inti */
+    --color-ink: #16233A;
+    --color-canvas: #F5F7FA;
+    --color-surface: #FFFFFF;
+    --color-border: #DCE1E8;
+    --color-accent: #0E7C86;
+    --color-accent-soft: #E4F3F3;
+    --color-rating: #E4A73B;
+
+    /* Warna Semantik */
+    --color-success: #3F8F5F;
+    --color-warning: #C97A2B;
+    --color-danger: #C1503F;
+    --color-muted: #6B7688;
+
+    /* Radius */
+    --radius-card: 8px;
+    --radius-input: 6px;
+
+    /* Spacing */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-12: 48px;
+
+    /* Font */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
 }
