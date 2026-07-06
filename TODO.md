@@ -67,20 +67,20 @@ Buat via `php artisan make:migration --no-interaction`. Perhatikan **urutan** ka
 
 Buat via `php artisan make:model --no-interaction`. Untuk tiap model: `$fillable`/`$guarded`, `casts`, relasi Eloquent, dan factory.
 
-- [ ] `StudyProgram` — hasMany: classGroups, courses, lecturers, students.
-- [ ] `User` (edit existing) — cast `must_change_password` bool; hasOne lecturer/student; belongsTo studyProgram (nullable, dipakai kaprodi); helper `isAdmin()`, `isLecturer()`, `isStudent()`, `isKaprodi()`.
-- [ ] `ClassGroup` — belongsTo studyProgram; hasMany students, courseClassAssignments. Accessor untuk `class_code` bila mau auto-generate.
-- [ ] `Course` — belongsTo studyProgram; hasMany courseClassAssignments.
-- [ ] `Lecturer` — belongsTo user, studyProgram; hasMany courseClassAssignments.
-- [ ] `Student` — belongsTo user, studyProgram, classGroup, creator (created_by); hasMany evaluations. Cast `status`.
-- [ ] `EvaluationPeriod` — hasMany courseClassAssignments, evaluations. Cast dates + status. Scope `open()`. Method/observer untuk menegakkan **hanya 1 periode `open`** dalam satu waktu (tolak/`closed`-kan periode lain saat satu dibuka).
-- [ ] `EvaluationQuestion` — scope `active()`, order by `order_number`.
-- [ ] `CourseClassAssignment` — belongsTo course, lecturer, classGroup, evaluationPeriod, creator; hasMany evaluations.
-- [ ] `Evaluation` — belongsTo student, courseClassAssignment, evaluationPeriod; hasMany answers; hasOne impression.
-- [ ] `EvaluationAnswer` — belongsTo evaluation, question.
-- [ ] `EvaluationImpression` — belongsTo evaluation.
-- [ ] (Opsional) Enum PHP untuk `role`, `status` mahasiswa, `status` periode, `semester_type`, `degree_level` (TitleCase keys, sesuai konvensi PHP project).
-- [ ] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
+- [x] `StudyProgram` — hasMany: classGroups, courses, lecturers, students.
+- [x] `User` (edit existing) — cast `must_change_password` bool; hasOne lecturer/student; belongsTo studyProgram (nullable, dipakai kaprodi); helper `isAdmin()`, `isLecturer()`, `isStudent()`, `isKaprodi()`.
+- [x] `ClassGroup` — belongsTo studyProgram; hasMany students, courseClassAssignments. Accessor untuk `class_code` bila mau auto-generate.
+- [x] `Course` — belongsTo studyProgram; hasMany courseClassAssignments.
+- [x] `Lecturer` — belongsTo user, studyProgram; hasMany courseClassAssignments.
+- [x] `Student` — belongsTo user, studyProgram, classGroup, creator (created_by); hasMany evaluations. Cast `status`.
+- [x] `EvaluationPeriod` — hasMany courseClassAssignments, evaluations. Cast dates + status. Scope `open()`. Method/observer untuk menegakkan **hanya 1 periode `open`** dalam satu waktu (tolak/`closed`-kan periode lain saat satu dibuka).
+- [x] `EvaluationQuestion` — scope `active()`, order by `order_number`.
+- [x] `CourseClassAssignment` — belongsTo course, lecturer, classGroup, evaluationPeriod, creator; hasMany evaluations.
+- [x] `Evaluation` — belongsTo student, courseClassAssignment, evaluationPeriod; hasMany answers; hasOne impression.
+- [x] `EvaluationAnswer` — belongsTo evaluation, question.
+- [x] `EvaluationImpression` — belongsTo evaluation.
+- [x] (Opsional) Enum PHP untuk `role`, `status` mahasiswa, `status` periode, `semester_type`, `degree_level` (TitleCase keys, sesuai konvensi PHP project).
+- [x] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
 
 ---
 
