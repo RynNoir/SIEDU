@@ -9,19 +9,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'code', 'degree_level', 'total_semester'])]
+#[Fillable(['name', 'code', 'degree_level', 'total_semesters'])]
 class StudyProgram extends Model
 {
-    /** @use HasFactory<\Database\Factories\StudyProgramFactory> */
+    /** @use HasFactory<StudyProgramFactory> */
     use HasFactory;
 
     /**
-    *  @return array<string, string>
-    */
-    protected function casts(): array_diff_assoc{
-        return[
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
             'degree_level' => DegreeLevel::class,
-            'total_semester' => 'integer',
+            'total_semesters' => 'integer',
         ];
     }
 
