@@ -51,5 +51,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EvaluationPeriodSeeder::class,
         ]);
+
+        $this->call([
+            CourseClassAssignmentSeeder::class,
+        ]);
     }
 }
