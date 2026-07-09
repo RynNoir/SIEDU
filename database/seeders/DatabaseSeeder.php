@@ -47,5 +47,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EvaluationQuestionSeeder::class,
         ]);
+
+        $this->call([
+            EvaluationPeriodSeeder::class,
+        ]);
     }
 }
