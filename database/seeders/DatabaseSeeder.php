@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StudyProgramSeeder::class,
         ]);
+
+        $this->call([
+            AdminSeeder::class,
+        ]);
     }
 }
