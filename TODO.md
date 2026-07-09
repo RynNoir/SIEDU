@@ -80,7 +80,7 @@ Buat via `php artisan make:model --no-interaction`. Untuk tiap model: `$fillable
 - [x] `EvaluationAnswer` — belongsTo evaluation, question.
 - [x] `EvaluationImpression` — belongsTo evaluation.
 - [x] (Opsional) Enum PHP untuk `role`, `status` mahasiswa, `status` periode, `semester_type`, `degree_level` (TitleCase keys, sesuai konvensi PHP project).
-- [] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
+- [x] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
 
 ---
 
@@ -88,18 +88,18 @@ Buat via `php artisan make:model --no-interaction`. Untuk tiap model: `$fillable
 
 Buat factory untuk tiap model, lalu seeder terstruktur. Panggil dari `DatabaseSeeder`.
 
-- [ ] `StudyProgramSeeder`: 5 prodi persis PRD §2.1 (MI, TK, SI D3/6 sem; TRPL, ANIM D4/8 sem).
-- [ ] `EvaluationQuestionSeeder`: pertanyaan template PRD §5.3 (5 kategori, semua format "Bagaimana penilaian Anda terhadap...", + 1 rangkuman keseluruhan), dengan `order_number` berurutan.
-- [ ] `AdminSeeder`: 1 akun admin (`role=admin`, `must_change_password=false` agar bisa langsung login untuk setup).
-- [ ] `KaprodiSeeder`: 1 akun kaprodi per prodi (`role=kaprodi`, `study_program_id` diisi sesuai kolom yang ditambahkan di Fase 1), password default `"password"`, `must_change_password=true`.
-- [ ] `ClassGroupSeeder`: generate beberapa kelas dummy per prodi untuk ≥1 tahun ajaran (mis. `MI1A/B`, `TK1A`, `TRPL1A`, dst). Terapkan aturan `class_code` = `{KODE}{TAHUN}{HURUF}` dan `tahun = ceil(semester/2)`.
-- [ ] `CourseSeeder`: kurikulum paket dummy per prodi per semester (beberapa MK per semester dengan SKS).
-- [ ] `StudentSeeder` + factory: ~25 mahasiswa/kelas, `status=aktif`, `current_semester` konsisten dgn `year_level`. Buat `user` terkait (role=student). NIM unik.
-- [ ] `LecturerSeeder` + factory: beberapa dosen per prodi, `user` role=lecturer, NIP unik.
-- [ ] `EvaluationPeriodSeeder`: 1 periode `open` (aktif sekarang) + 1 periode `closed` (histori untuk uji filter perbandingan).
-- [ ] `CourseClassAssignmentSeeder`: assign dosen ke MK+kelas untuk periode aktif. **Sertakan ≥1 kasus team teaching** (2 dosen untuk 1 MK di 1 kelas) untuk menguji jalur v1.1.
-- [ ] (Opsional untuk uji dashboard dosen) `EvaluationSeeder`: generate evaluasi + jawaban + kesan/saran dummy dari sebagian mahasiswa, cukup untuk menembus threshold ≥5 responden di beberapa assignment.
-- [ ] Jalankan `php artisan migrate:fresh --seed`, verifikasi jumlah baris via `database-query`.
+- [x] `StudyProgramSeeder`: 5 prodi persis PRD §2.1 (MI, TK, SI D3/6 sem; TRPL, ANIM D4/8 sem).
+- [x] `EvaluationQuestionSeeder`: pertanyaan template PRD §5.3 (5 kategori, semua format "Bagaimana penilaian Anda terhadap...", + 1 rangkuman keseluruhan), dengan `order_number` berurutan.
+- [x] `AdminSeeder`: 1 akun admin (`role=admin`, `must_change_password=false` agar bisa langsung login untuk setup).
+- [x] `KaprodiSeeder`: 1 akun kaprodi per prodi (`role=kaprodi`, `study_program_id` diisi sesuai kolom yang ditambahkan di Fase 1), password default `"password"`, `must_change_password=true`.
+- [x] `ClassGroupSeeder`: generate beberapa kelas dummy per prodi untuk ≥1 tahun ajaran (mis. `MI1A/B`, `TK1A`, `TRPL1A`, dst). Terapkan aturan `class_code` = `{KODE}{TAHUN}{HURUF}` dan `tahun = ceil(semester/2)`.
+- [x] `CourseSeeder`: kurikulum paket dummy per prodi per semester (beberapa MK per semester dengan SKS).
+- [x] `StudentSeeder` + factory: ~25 mahasiswa/kelas, `status=aktif`, `current_semester` konsisten dgn `year_level`. Buat `user` terkait (role=student). NIM unik.
+- [x] `LecturerSeeder` + factory: beberapa dosen per prodi, `user` role=lecturer, NIP unik.
+- [x] `EvaluationPeriodSeeder`: 1 periode `open` (aktif sekarang) + 1 periode `closed` (histori untuk uji filter perbandingan).
+- [x] `CourseClassAssignmentSeeder`: assign dosen ke MK+kelas untuk periode aktif. **Sertakan ≥1 kasus team teaching** (2 dosen untuk 1 MK di 1 kelas) untuk menguji jalur v1.1.
+- [x] (Opsional untuk uji dashboard dosen) `EvaluationSeeder`: generate evaluasi + jawaban + kesan/saran dummy dari sebagian mahasiswa, cukup untuk menembus threshold ≥5 responden di beberapa assignment.
+- [x] Jalankan `php artisan migrate:fresh --seed`, verifikasi jumlah baris via `database-query`.
 
 ---
 

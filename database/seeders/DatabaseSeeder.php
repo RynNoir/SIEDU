@@ -19,44 +19,15 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             StudyProgramSeeder::class,
-        ]);
-
-        $this->call([
             AdminSeeder::class,
-        ]);
-
-        $this->call([
             KaprodiSeeder::class,
-        ]);
-
-        $this->call([
             ClassGroupSeeder::class,
-        ]);
-        $this->call([
             CourseSeeder::class,
-        ]);
-
-        $this->call([
             LecturerSeeder::class,
-        ]);
-
-        $this->call([
             StudentSeeder::class,
-        ]);
-
-        $this->call([
             EvaluationQuestionSeeder::class,
-        ]);
-
-        $this->call([
             EvaluationPeriodSeeder::class,
-        ]);
-
-        $this->call([
             CourseClassAssignmentSeeder::class,
-        ]);
-
-        $this->call([
             EvaluationSeeder::class,
         ]);
     }
