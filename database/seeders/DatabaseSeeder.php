@@ -55,5 +55,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CourseClassAssignmentSeeder::class,
         ]);
+
+        $this->call([
+            EvaluationSeeder::class,
+        ]);
     }
 }
