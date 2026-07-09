@@ -80,7 +80,7 @@ Buat via `php artisan make:model --no-interaction`. Untuk tiap model: `$fillable
 - [x] `EvaluationAnswer` — belongsTo evaluation, question.
 - [x] `EvaluationImpression` — belongsTo evaluation.
 - [x] (Opsional) Enum PHP untuk `role`, `status` mahasiswa, `status` periode, `semester_type`, `degree_level` (TitleCase keys, sesuai konvensi PHP project).
-- [x] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
+- [] Arch/unit test ringan: pastikan relasi tidak error (`Model::factory()->create()`).
 
 ---
 
@@ -211,8 +211,7 @@ PRD §6.5 awalnya menyebut kaprodi opsional; **project ini menetapkan kaprodi se
 
 ## Catatan Perluasan dari PRD Asli
 
-Dua keputusan project ini **menambah/mengubah** skema 12-tabel asli PRD — dicatat di sini agar tidak terlewat:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-
+Dua keputusan project ini **menambah/mengubah** skema 12-tabel asli PRD — dicatat di sini agar tidak terlewat:
 1. **Kolom `role` di `users`** bertambah 1 nilai enum: `'kaprodi'` (PRD asli hanya admin/lecturer/student).
 2. **Kolom baru `users.study_program_id`** (nullable FK, ditambahkan di Fase 1) untuk membatasi cakupan dashboard kaprodi ke prodi yang dipimpinnya (dipakai di Fase 9). Tidak menambah tabel baru — tetap 12 tabel.
 3. **Penegakan periode tunggal**: PRD tidak eksplisit melarang >1 periode `open` bersamaan — project ini menegakkan **hanya 1 periode `open`** di satu waktu (lihat Fase 5 & Fase 2 `EvaluationPeriod`).
