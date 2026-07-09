@@ -28,5 +28,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             KaprodiSeeder::class,
         ]);
+
+        $this->call([
+            ClassGroupSeeder::class,
+        ]);
     }
 }
