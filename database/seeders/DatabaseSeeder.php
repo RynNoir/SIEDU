@@ -32,5 +32,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ClassGroupSeeder::class,
         ]);
+        $this->call([
+            CourseSeeder::class,
+        ]);
     }
 }
