@@ -122,14 +122,14 @@ Grup route `admin` + middleware role. Controller resourceful, FormRequest untuk 
 - [x] CRUD `study_programs`.
 - [x] CRUD `class_groups` (auto-generate `class_code` dari prodi+year+letter; validasi unik per academic_year).
 - [x] CRUD `courses` (validasi: `semester` 7/8 hanya untuk prodi D4 — PRD §7.2).
-- [ ] CRUD akun `lecturers` (buat `user` role=lecturer + `must_change_password=true` + password default sekaligus).
-- [ ] CRUD akun `students` (buat `user` role=student; set `created_by`; validasi konsistensi `current_semester` ↔ `year_level` kelas — PRD §7.1). Tabel data mahasiswa mengikuti wireframe GUIDELINE.md §4.4 (search NIM/nama + filter chip prodi/kelas/status).
-- [ ] CRUD `evaluation_periods` + aksi buka/tutup (`draft`→`open`→`closed`). **Tegakkan periode tunggal**: saat admin membuka satu periode, sistem otomatis mengubah periode `open` lain (jika ada) menjadi `closed` sebelum periode baru dibuka — dilakukan dalam 1 transaction di controller/service. Badge status pakai `<x-badge-status>` (GUIDELINE.md §6.4: Open = teal, Closed = abu).
-- [ ] CRUD `evaluation_questions` (kelola kategori string, urutan, aktif/nonaktif).
-- [ ] CRUD `course_class_assignments`: form pilih course+lecturer+class+period; set `created_by`. **Dukung tambah >1 dosen (team teaching)**; tegakkan unique 4-kolom & tolak duplikat dgn pesan jelas (pesan error mengikuti nada lugas GUIDELINE.md §12, misal "Dosen ini sudah diassign ke mata kuliah & kelas yang sama pada periode ini").
-- [ ] Validasi §7.1 & §7.2 diterapkan di FormRequest assignment (semester course cocok year_level kelas).
-- [ ] Empty state untuk tabel kosong (belum ada data) mengikuti prinsip GUIDELINE.md §6.7: jelas, informatif, jelaskan kondisi — bukan sekadar "Data tidak ditemukan".
-- [ ] Feature test CRUD utama + aturan validasi jenjang/semester.
+- [x] CRUD akun `lecturers` (buat `user` role=lecturer + `must_change_password=true` + password default sekaligus).
+- [x] CRUD akun `students` (buat `user` role=student; set `created_by`; validasi konsistensi `current_semester` ↔ `year_level` kelas — PRD §7.1). Tabel data mahasiswa mengikuti wireframe GUIDELINE.md §4.4 (search NIM/nama + filter chip prodi/kelas/status).
+- [x] CRUD `evaluation_periods` + aksi buka/tutup (`draft`→`open`→`closed`). **Tegakkan periode tunggal**: saat admin membuka satu periode, sistem otomatis mengubah periode `open` lain (jika ada) menjadi `closed` sebelum periode baru dibuka — dilakukan dalam 1 transaction di controller/service. Badge status pakai `<x-badge-status>` (GUIDELINE.md §6.4: Open = teal, Closed = abu).
+- [x] CRUD `evaluation_questions` (kelola kategori string, urutan, aktif/nonaktif).
+- [x] CRUD `course_class_assignments`: form pilih course+lecturer+class+period; set `created_by`. **Dukung tambah >1 dosen (team teaching)**; tegakkan unique 4-kolom & tolak duplikat dgn pesan jelas (pesan error mengikuti nada lugas GUIDELINE.md §12, misal "Dosen ini sudah diassign ke mata kuliah & kelas yang sama pada periode ini").
+- [x] Validasi §7.1 & §7.2 diterapkan di FormRequest assignment (semester course cocok year_level kelas).
+- [x] Empty state untuk tabel kosong (belum ada data) mengikuti prinsip GUIDELINE.md §6.7: jelas, informatif, jelaskan kondisi — bukan sekadar "Data tidak ditemukan".
+- [x] Feature test CRUD utama + aturan validasi jenjang/semester.
 
 ---
 
