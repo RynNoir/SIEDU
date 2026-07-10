@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClassGroupController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EvaluationQuestionController;
 use App\Http\Controllers\Admin\StudyProgramController;
@@ -28,6 +29,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('study-programs', StudyProgramController::class)->except('show');
     Route::resource('courses', CourseController::class)->except('show');
     Route::resource('evaluation-questions', EvaluationQuestionController::class)->except('show');
+    Route::resource('class-groups', ClassGroupController::class)->except('show');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {
