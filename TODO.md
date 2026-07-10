@@ -118,10 +118,10 @@ Buat factory untuk tiap model, lalu seeder terstruktur. Panggil dari `DatabaseSe
 
 Grup route `admin` + middleware role. Controller resourceful, FormRequest untuk validasi, Blade views. **Ikuti GUIDELINE.md §4.4 (wireframe tabel), §6.1 (tombol), §6.2 (form), §6.3 (tabel), §6.4 (badge status), §6.7 (empty state)** — bangun komponen Blade reusable (`<x-table>`, `<x-badge-status>`, `<x-button>`, dsb.) sekali di fase ini agar dipakai ulang di Fase 7–9.
 
-- [ ] Komponen Blade dasar sesuai GUIDELINE.md: `<x-button variant="primary|secondary|destructive|disabled">` (§6.1), `<x-badge-status>` untuk status aktif/cuti/DO/periode (§6.4, pill + label teks, jangan hanya warna), `<x-table>` dengan header sticky `color-canvas` + border 1px tanpa zebra-stripe (§6.3), kolom NIM/kode kelas/kode MK pakai kelas `font-mono` `text-mono-data` (§3.2).
-- [ ] CRUD `study_programs`.
-- [ ] CRUD `class_groups` (auto-generate `class_code` dari prodi+year+letter; validasi unik per academic_year).
-- [ ] CRUD `courses` (validasi: `semester` 7/8 hanya untuk prodi D4 — PRD §7.2).
+- [x] Komponen Blade dasar sesuai GUIDELINE.md: `<x-button variant="primary|secondary|destructive|disabled">` (§6.1), `<x-badge-status>` untuk status aktif/cuti/DO/periode (§6.4, pill + label teks, jangan hanya warna), `<x-table>` dengan header sticky `color-canvas` + border 1px tanpa zebra-stripe (§6.3), kolom NIM/kode kelas/kode MK pakai kelas `font-mono` `text-mono-data` (§3.2).
+- [x] CRUD `study_programs`.
+- [x] CRUD `class_groups` (auto-generate `class_code` dari prodi+year+letter; validasi unik per academic_year).
+- [x] CRUD `courses` (validasi: `semester` 7/8 hanya untuk prodi D4 — PRD §7.2).
 - [ ] CRUD akun `lecturers` (buat `user` role=lecturer + `must_change_password=true` + password default sekaligus).
 - [ ] CRUD akun `students` (buat `user` role=student; set `created_by`; validasi konsistensi `current_semester` ↔ `year_level` kelas — PRD §7.1). Tabel data mahasiswa mengikuti wireframe GUIDELINE.md §4.4 (search NIM/nama + filter chip prodi/kelas/status).
 - [ ] CRUD `evaluation_periods` + aksi buka/tutup (`draft`→`open`→`closed`). **Tegakkan periode tunggal**: saat admin membuka satu periode, sistem otomatis mengubah periode `open` lain (jika ada) menjadi `closed` sebelum periode baru dibuka — dilakukan dalam 1 transaction di controller/service. Badge status pakai `<x-badge-status>` (GUIDELINE.md §6.4: Open = teal, Closed = abu).
