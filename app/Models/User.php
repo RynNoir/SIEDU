@@ -78,4 +78,17 @@ class User extends Authenticatable
     {
         return $this->role === Role::Kaprodi;
     }
+
+    /**
+     * Nama route dashboard sesuai role (landing pasca-login).
+     */
+    public function dashboardRoute(): string
+    {
+        return match ($this->role) {
+            Role::Admin => 'admin.dashboard',
+            Role::Lecturer => 'lecturer.dashboard',
+            Role::Student => 'student.dashboard',
+            Role::Kaprodi => 'kaprodi.dashboard',
+        };
+    }
 }
