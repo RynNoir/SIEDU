@@ -1,15 +1,6 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-ink leading-tight">Dashboard Admin</h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface border border-border rounded-lg shadow-sm">
-                <div class="p-6 text-ink">
-                    Selamat datang, {{ auth()->user()->name }}. di Dashboard
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+<x-admin-layout header="Dashboard Admin">
+    <x-card>
+        <p class="text-ink">Selamat datang, {{ auth()->user()->name }}.</p>
+        <p class="mt-1 text-sm text-muted">Kelola master data lewat menu di samping.</p>
+    </x-card>
+</x-admin-layout>

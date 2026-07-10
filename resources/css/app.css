@@ -39,3 +39,5 @@
     --font-body: 'IBM Plex Sans', sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
 }
+
+[x-cloak] { display: none !important; }
