@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ClassGroupController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EvaluationQuestionController;
+use App\Http\Controllers\Admin\LecturerController;
 use App\Http\Controllers\Admin\StudyProgramController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('courses', CourseController::class)->except('show');
     Route::resource('evaluation-questions', EvaluationQuestionController::class)->except('show');
     Route::resource('class-groups', ClassGroupController::class)->except('show');
+    Route::resource('lecturers', LecturerController::class)->except('show');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {
