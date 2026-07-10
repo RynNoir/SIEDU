@@ -137,12 +137,12 @@ Grup route `admin` + middleware role. Controller resourceful, FormRequest untuk 
 
 Implementasi PRD §6.1. Service class + command Artisan + (opsional) tombol admin.
 
-- [ ] `app/Services/ClassPromotionService.php` via `make:class`. Method `promote(string $fromAcademicYear, string $toAcademicYear)`.
-- [ ] Logika: ambil `class_groups` tahun berjalan → skip yang sudah `year_level` maksimum prodi (lulus) → buat `class_groups` baru (`year_level+1`, `class_letter` sama, `class_code` regen) → pindahkan mahasiswa `status=aktif` ke kelas baru + `current_semester += 2`.
-- [ ] Kecualikan `cuti` (assignment manual nanti) dan `DO` (tetap di kelas terakhir untuk histori).
-- [ ] Bungkus dalam DB transaction; idempotent/aman bila dijalankan dua kali (cek kelas tujuan sudah ada).
-- [ ] Command `php artisan class:promote {fromYear} {toYear}` memanggil service.
-- [ ] Unit/feature test skenario: mahasiswa aktif naik, cuti tetap, DO tetap, kelas tahun akhir tidak dinaikkan (lulus).
+- [x] `app/Services/ClassPromotionService.php` via `make:class`. Method `promote(string $fromAcademicYear, string $toAcademicYear)`.
+- [x] Logika: ambil `class_groups` tahun berjalan → skip yang sudah `year_level` maksimum prodi (lulus) → buat `class_groups` baru (`year_level+1`, `class_letter` sama, `class_code` regen) → pindahkan mahasiswa `status=aktif` ke kelas baru + `current_semester += 2`.
+- [x] Kecualikan `cuti` (assignment manual nanti) dan `DO` (tetap di kelas terakhir untuk histori).
+- [x] Bungkus dalam DB transaction; idempotent/aman bila dijalankan dua kali (cek kelas tujuan sudah ada).
+- [x] Command `php artisan class:promote {fromYear} {toYear}` memanggil service.
+- [x] Unit/feature test skenario: mahasiswa aktif naik, cuti tetap, DO tetap, kelas tahun akhir tidak dinaikkan (lulus).
 
 ---
 
