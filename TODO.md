@@ -105,12 +105,12 @@ Buat factory untuk tiap model, lalu seeder terstruktur. Panggil dari `DatabaseSe
 
 ## Fase 4 — Autentikasi, Role & Force-Change-Password
 
-- [ ] Breeze Blade sudah terpasang (Fase 0). Login pakai email + password.
-- [ ] Middleware `role` (mis. `EnsureUserHasRole`) — daftarkan alias di `bootstrap/app.php` (Laravel 13). Batasi grup route per role (`admin`, `lecturer`, `student`, `kaprodi`).
-- [ ] Middleware `MustChangePassword`: jika `must_change_password=true`, redirect paksa ke halaman ganti password (kecuali route logout & route ganti password itu sendiri).
-- [ ] Halaman & controller ganti password: set password baru + `must_change_password=false`.
-- [ ] Redirect pasca-login sesuai role: admin→dashboard admin, lecturer→dashboard dosen, student→daftar evaluasi, kaprodi→dashboard prodi.
-- [ ] Feature test Pest: login tiap role, redirect force-password, middleware menolak akses lintas-role.
+- [x] Breeze Blade sudah terpasang (Fase 0). Login pakai email + password.
+- [x] Middleware `role` (mis. `EnsureUserHasRole`) — daftarkan alias di `bootstrap/app.php` (Laravel 13). Batasi grup route per role (`admin`, `lecturer`, `student`, `kaprodi`).
+- [x] Middleware `MustChangePassword`: jika `must_change_password=true`, redirect paksa ke halaman ganti password (kecuali route logout & route ganti password itu sendiri).
+- [x] Halaman & controller ganti password: set password baru + `must_change_password=false`.
+- [x] Redirect pasca-login sesuai role: admin→dashboard admin, lecturer→dashboard dosen, student→daftar evaluasi, kaprodi→dashboard prodi.
+- [x] Feature test Pest: login tiap role, redirect force-password, middleware menolak akses lintas-role.
 
 ---
 
