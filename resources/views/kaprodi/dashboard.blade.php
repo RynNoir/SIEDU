@@ -18,6 +18,18 @@
     @if ($byCourse->isEmpty())
         <x-empty-state message="Belum ada data penugasan/evaluasi untuk prodi ini." />
     @else
+        @php $allAssignments = $byCourse->flatten(1); @endphp
+
+        {{-- KPI stat cards (GUIDELINE §13.3) --}}
+        <div class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <x-stat-card label="Mata Kuliah" :value="$byCourse->count()" icon="course" />
+            <x-stat-card label="Dosen Dipantau" :value="$allAssignments->pluck('lecturer_id')->unique()->count()" icon="lecturer" />
+            <x-stat-card label="Total Responden" :value="$allAssignments->sum('evaluations_count')" icon="student" />
+            <x-stat-card label="Rata-rata Prodi"
+                :value="$avgById->isNotEmpty() ? number_format((float) $avgById->avg(), 1) : '–'"
+                :rating="$avgById->isNotEmpty()" icon="results" />
+        </div>
+
         {{-- Perbandingan per MK: dosen & kelas paralel berdampingan --}}
         @foreach ($byCourse as $items)
             @php $course = $items->first()->course; @endphp

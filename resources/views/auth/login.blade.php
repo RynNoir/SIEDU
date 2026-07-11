@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-6">
+        <h2 class="font-display text-2xl font-semibold text-ink">Masuk</h2>
+        <p class="mt-1 text-sm text-muted">Gunakan akun yang diberikan admin untuk masuk.</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -14,7 +19,7 @@
 
         <!-- Password -->
         <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <x-input-label for="password" :value="'Kata Sandi'" />
 
             <x-text-input id="password" class="block mt-1 w-full"
                             type="password"
@@ -28,19 +33,19 @@
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" class="rounded border-border text-accent shadow-sm focus:ring-accent" name="remember">
-                <span class="ms-2 text-sm text-muted">{{ __('Remember me') }}</span>
+                <span class="ms-2 text-sm text-muted">Ingat saya</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-muted hover:text-ink rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+                    Lupa kata sandi?
                 </a>
             @endif
 
             <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+                Masuk
             </x-primary-button>
         </div>
     </form>

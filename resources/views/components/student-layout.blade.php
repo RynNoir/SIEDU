@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,13 +15,36 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="flex min-h-screen flex-col bg-canvas font-body text-ink antialiased">
     <header class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-8">
         <a href="{{ route('student.evaluations.index') }}" class="font-display text-lg font-semibold">SIEDU</a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="text-sm text-muted hover:text-ink">{{ auth()->user()->name }} · Keluar</button>
-        </form>
+
+        {{-- Avatar dropdown akun (GUIDELINE §13.2), disembunyikan di mobile (pakai bottom-nav) --}}
+        <div class="hidden sm:block">
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <button class="flex items-center gap-2 rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2" aria-label="Menu akun">
+                        <x-avatar :name="auth()->user()->name" size="sm" />
+                        <span class="text-sm text-ink">{{ auth()->user()->name }}</span>
+                    </button>
+                </x-slot>
+                <x-slot name="content">
+                    @if (Route::has('profile.edit'))
+                        <x-dropdown-link :href="route('profile.edit')">
+                            <span class="flex items-center gap-2"><x-icon name="profile" class="size-4 text-muted" /> Profil</span>
+                        </x-dropdown-link>
+                    @endif
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown-link :href="route('logout')"
+                            onclick="event.preventDefault(); this.closest('form').submit();">
+                            <span class="flex items-center gap-2"><x-icon name="logout" class="size-4 text-muted" /> Keluar</span>
+                        </x-dropdown-link>
+                    </form>
+                </x-slot>
+            </x-dropdown>
+        </div>
     </header>
 
     <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 lg:pb-8">
@@ -38,23 +62,35 @@
     </main>
 
     {{-- Bottom-nav mobile (§10) --}}
-    <nav class="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface lg:hidden">
+    <nav class="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface sm:hidden">
         <a href="{{ route('student.evaluations.index') }}"
-            class="flex flex-1 flex-col items-center gap-1 py-2 text-xs {{ request()->routeIs('student.evaluations.*') ? 'text-accent' : 'text-muted' }}">
-            <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
+            @class([
+                'flex flex-1 flex-col items-center gap-1 py-2 text-xs',
+                'text-accent' => request()->routeIs('student.evaluations.*'),
+                'text-muted' => ! request()->routeIs('student.evaluations.*'),
+            ])>
+            <x-icon name="evaluate" class="size-6" />
             Evaluasi
         </a>
+        @if (Route::has('profile.edit'))
+            <a href="{{ route('profile.edit') }}"
+                @class([
+                    'flex flex-1 flex-col items-center gap-1 py-2 text-xs',
+                    'text-accent' => request()->routeIs('profile.*'),
+                    'text-muted' => ! request()->routeIs('profile.*'),
+                ])>
+                <x-icon name="profile" class="size-6" />
+                Profil
+            </a>
+        @endif
         <form method="POST" action="{{ route('logout') }}" class="flex-1">
             @csrf
             <button type="submit" class="flex w-full flex-col items-center gap-1 py-2 text-xs text-muted">
-                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <x-icon name="logout" class="size-6" />
                 Keluar
             </button>
         </form>
     </nav>
 </body>
+
 </html>

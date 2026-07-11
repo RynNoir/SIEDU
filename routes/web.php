@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ClassGroupController;
 use App\Http\Controllers\Admin\ClassPromotionController;
 use App\Http\Controllers\Admin\CourseClassAssignmentController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EvaluationPeriodController;
 use App\Http\Controllers\Admin\EvaluationQuestionController;
 use App\Http\Controllers\Admin\LecturerController;
@@ -35,7 +36,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('study-programs', StudyProgramController::class)->except('show');
     Route::resource('courses', CourseController::class)->except('show');
     Route::resource('evaluation-questions', EvaluationQuestionController::class)->except('show');

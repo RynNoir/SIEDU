@@ -16,6 +16,13 @@
     @if ($assignments->isEmpty())
         <x-empty-state message="Belum ada mata kuliah yang diampu pada periode ini." />
     @else
+        {{-- KPI stat cards (GUIDELINE §13.3) --}}
+        <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <x-stat-card label="MK Diampu" :value="$assignments->count()" icon="course" />
+            <x-stat-card label="Total Responden" :value="$assignments->sum('evaluations_count')" icon="student" />
+            <x-stat-card label="Kelas" :value="$assignments->pluck('class_group_id')->unique()->count()" icon="class-group" />
+        </div>
+
         <div class="grid gap-3 sm:grid-cols-2">
             @foreach ($assignments as $assignment)
                 <a href="{{ route('lecturer.assignments.show', $assignment) }}"
