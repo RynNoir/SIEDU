@@ -4,7 +4,7 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: **Fase 0–10 selesai (2026-07-12) — project SIEDU rampung.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
+**Status project saat ini**: **Fase 0–10 selesai (2026-07-12). Fase 11 (pengayaan UI) sedang dikerjakan.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -206,6 +206,19 @@ PRD §6.5 awalnya menyebut kaprodi opsional; **project ini menetapkan kaprodi se
 - [x] `php artisan test --compact` hijau (93 test, 242 assertion).
 - [ ] (Opsional) Browser/smoke test halaman utama tiap role (Pest 4 browser) untuk cek error JS. **Dilewati** — butuh instalasi `pestphp/pest-plugin-browser` + Playwright (dependency baru), di luar cakupan otomatis sesi ini.
 - [x] `npm run build` untuk aset produksi.
+
+---
+
+## Fase 11 — Pengayaan UI (App Shell + Dashboard)
+
+Restyle/enrichment **tampilan saja** — tidak menyentuh controller, route, migrasi, atau business logic; 93 test harus tetap hijau. Terinspirasi pola dashboard admin modern (referensi eksternal Elegent), tapi **menolak** palet/font/shadow-tebal/library chart-nya. Semua mengikuti **GUIDELINE.md §13** (+ token §2, tipografi §3). Lihat PRD.md riwayat revisi v1.3 (UI).
+
+- [ ] **Langkah 1 — App shell (§13.1, §13.2)**: upgrade layout semua role (`admin`/`lecturer`/`kaprodi`/`student`) ke sidebar mengambang berikon + item aktif `accent-soft`/`accent`, dan topbar dengan avatar-dropdown (Profil/Keluar) menggantikan tombol teks. Satu partial nav bersama bila memungkinkan. Pertahankan breakpoint & bottom-nav mobile mahasiswa (§10).
+- [ ] **Langkah 2 — Komponen baru**: `<x-stat-card>` (§13.3), `<x-avatar>` inisial (§13.4), `<x-icon>` (set ikon stroke inline SVG), perkaya `<x-card>` bila perlu. Semua pakai token GUIDELINE.
+- [ ] **Langkah 3 — Dashboard (§13.3, §13.5)**: isi dashboard tiap role dengan baris KPI `<x-stat-card>` (Admin: jumlah prodi/dosen/mahasiswa/kelas/periode aktif; Dosen: rata-rata skor, responden, MK diampu; Kaprodi: agregat prodi) + bar/meter **SVG-CSS ringan tanpa library** (opsi A). Angka rata-rata boleh didampingi glyph `⬥` amber (§5).
+- [ ] **Langkah 4 — Tabel datasheet (§6.3, §13.6)**: terapkan gaya tabel konsisten (header `canvas`, baris border 1px tanpa zebra, hover `accent-soft`, kolom NIM/kode `text-mono-data`) ke semua `index.blade.php` admin. Border 1px sebagai struktur utama, shadow tipis seperlunya.
+- [ ] **Langkah 5 — Auth split layout (§13.7)**: halaman login/lupa-password jadi dua kolom (panel identitas SIEDU + form), menumpuk di mobile. Patuh §6.2 & §12.
+- [ ] Verifikasi: `vendor/bin/pint --format agent`, `php artisan test --compact` hijau, `npm run build` sukses. Update baris status & centang Fase 11 saat selesai.
 
 ---
 

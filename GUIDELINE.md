@@ -325,3 +325,53 @@ Font di atas tersedia gratis via Google Fonts — bisa langsung di-import di lay
 - Sebut sesuatu dengan istilah yang dikenal pengguna, bukan istilah teknis sistem: mahasiswa melihat **"Isi Evaluasi"**, bukan **"Submit Formulir Kuesioner ID#123"**.
 - Pesan error langsung ke inti masalah dan cara memperbaikinya: *"Semua pertanyaan wajib diberi nilai sebelum mengirim"* — bukan *"Terjadi kesalahan validasi"*.
 - Untuk dosen/kaprodi, gunakan nada netral-informatif pada data sensitif: *"Kesan & saran ditampilkan tanpa identitas mahasiswa"*, bukan nada defensif atau berlebihan meyakinkan.
+
+---
+
+## 13. App Shell & Dashboard yang Diperkaya (v1.1 design)
+
+Revisi tampilan ini memperkaya **kerangka aplikasi** (shell) dan **isi dashboard** agar lebih terstruktur dan informatif — terinspirasi pola tata letak dashboard admin modern (sidebar berikon + topbar + grid kartu data). **Semua pengayaan tetap 100% memakai token §2, tipografi §3, dan prinsip datasheet §1.** Yang **ditolak** dari referensi eksternal: paletnya (orange/cream/green), font dekoratif, shadow tebal berlebihan, dan penambahan library chart (kita pakai bar SVG/CSS murni, nol dependency).
+
+### 13.1 Sidebar (diperkaya)
+
+- Sidebar `surface` dengan **ikon di kiri tiap item nav** (garis/stroke, ukuran 20px, warna `color-muted`; item aktif → `color-accent`). Ikon memperjelas navigasi padat, bukan dekorasi.
+- Item aktif: latar `color-accent-soft`, teks + ikon `color-accent`, radius `radius-input`.
+- Item non-aktif: teks `color-ink`, hover latar `color-canvas`.
+- Header sidebar: wordmark **SIEDU** (`font-display`, semibold) + label role kecil (`text-muted`).
+- Grup nav yang panjang (mis. menu admin) boleh dikelompokkan dengan **label section** kecil (`text-label`, `color-muted`, uppercase tracking) — bukan accordion berat, cukup pemisah visual.
+- Struktur, breakpoint, dan bottom-nav mobile tetap mengikuti §4.1 & §10.
+
+### 13.2 Topbar (diperkaya)
+
+- Kiri: tombol menu (mobile) + judul halaman (`text-heading`).
+- Kanan: **avatar-inisial** pengguna (lihat §13.4) sebagai pemicu dropdown akun berisi **Profil** dan **Keluar** (§6.1 gaya tombol/link). Ganti tombol teks "Nama · Keluar" yang lama.
+- Tidak menambahkan notifikasi/pencarian global/pemilih bahasa (tidak ada backend-nya) — shell tetap jujur pada fungsi yang benar-benar ada.
+
+### 13.3 Kartu Statistik (KPI) — komponen `<x-stat-card>`
+
+Realisasi kartu ringkasan yang sudah tergambar di wireframe §4.3, distandarkan jadi komponen dashboard:
+
+- Kartu `surface`, border 1px `color-border`, radius `radius-card`.
+- Isi: **ikon** kecil dalam kotak `accent-soft` (opsional) · **label** (`text-label`, `color-muted`) · **angka besar** (`text-display-l`, `font-display`, `color-ink`) · **keterangan** kecil opsional (`text-small`).
+- Dipakai berjajar dalam grid responsif di puncak tiap dashboard (Admin: jumlah entitas; Dosen/Kaprodi: rata-rata skor, responden, MK diampu).
+- **Angka rata-rata skor** boleh didampingi 1 glyph diamond `⬥` `color-rating` untuk menegaskan konteks "skor" (konsisten §5) — tapi warna amber tetap **hanya** untuk konteks rating.
+
+### 13.4 Avatar Inisial — komponen `<x-avatar>`
+
+- Lingkaran/kotak-rounded `accent-soft`, teks inisial nama (1–2 huruf) `color-accent`, `font-display`.
+- Tidak memakai foto (SIEDU tak menyimpan media pengguna). Ukuran default 36–40px; target sentuh ≥44px saat jadi pemicu dropdown (§9).
+
+### 13.5 Grafik: Bar/Meter via SVG-CSS (tanpa library)
+
+- **Tidak menambah dependency chart.** Visualisasi data pakai bar horizontal proporsional (mode display-only Rating Gauge, §5) atau bar vertikal sederhana dari elemen `div`/SVG ber-`color-accent`/`color-rating`.
+- Cocok untuk: skor per kategori (dosen/kaprodi), distribusi rating 1–5, tren responden antar periode.
+- Tetap tenang & fungsional (datasheet), bukan grafik penuh warna dekoratif.
+
+### 13.6 Kartu & Bayangan
+
+- **Border 1px adalah struktur utama** (§4.1). Shadow hanya sangat tipis (`shadow-sm`) untuk elemen yang benar-benar "mengambang" (dropdown, modal, sidebar mobile). Jangan meniru shadow tebal referensi eksternal.
+
+### 13.7 Halaman Auth (split layout)
+
+- Halaman login/lupa-password: dua kolom pada desktop — **panel identitas** (kiri, latar `color-ink` atau `accent-soft`, wordmark SIEDU + tagline singkat) dan **form** (kanan, `surface`). Pada mobile menumpuk jadi satu kolom, panel identitas ringkas di atas.
+- Tetap patuh §6.2 (form) dan §12 (copy).
