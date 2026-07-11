@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
+    Route::get('/dashboard', fn () => redirect()->route('student.evaluations.index'))->name('dashboard');
     Route::view('/dashboard', 'student.dashboard')->name('dashboard');
 });
 
