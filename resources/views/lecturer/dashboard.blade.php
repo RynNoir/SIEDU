@@ -1,15 +1,37 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-ink leading-tight">Dashboard Dosen</h2>
-    </x-slot>
+<x-lecturer-layout header="Hasil Evaluasi">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm text-muted">Mata kuliah & kelas yang Anda ampu</p>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-surface border border-border rounded-lg shadow-sm">
-                <div class="p-6 text-ink">
-                    Selamat datang, {{ auth()->user()->name }}. di Dashboard
-                </div>
-            </div>
-        </div>
+        {{-- Filter chip periode (GUIDELINE §6.6) --}}
+        <form method="GET" class="flex items-center gap-2">
+            <x-select name="period_id" class="w-auto" onchange="this.form.submit()">
+                <option value="">Semua Periode</option>
+                @foreach ($periods as $period)
+                    <option value="{{ $period->id }}" @selected((string) $selectedPeriodId === (string) $period->id)>{{ $period->name }}</option>
+                @endforeach
+            </x-select>
+        </form>
     </div>
-</x-app-layout>
+
+    @if ($assignments->isEmpty())
+        <x-empty-state message="Belum ada mata kuliah yang diampu pada periode ini." />
+    @else
+        <div class="grid gap-3 sm:grid-cols-2">
+            @foreach ($assignments as $assignment)
+                <a href="{{ route('lecturer.assignments.show', $assignment) }}"
+                    class="block rounded-card border border-border bg-surface p-4 transition hover:border-accent">
+                    <p class="font-medium text-ink">{{ $assignment->course->name }}</p>
+                    <p class="mt-0.5 text-sm text-muted">
+                        <span class="font-mono">{{ $assignment->course->code }}</span> · Kelas
+                        <span class="font-mono">{{ $assignment->classGroup->class_code }}</span>
+                    </p>
+                    <p class="mt-3 text-sm text-muted">{{ $assignment->evaluationPeriod->name }}</p>
+                    <p class="mt-1 text-sm">
+                        <span class="font-display text-lg font-semibold text-ink">{{ $assignment->evaluations_count }}</span>
+                        <span class="text-muted">responden</span>
+                    </p>
+                </a>
+            @endforeach
+        </div>
+    @endif
+</x-lecturer-layout>
