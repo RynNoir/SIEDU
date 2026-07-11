@@ -17,7 +17,9 @@ use App\Http\Controllers\Student\EvaluationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check()
+        ? redirect()->route(auth()->user()->dashboardRoute())
+        : redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {

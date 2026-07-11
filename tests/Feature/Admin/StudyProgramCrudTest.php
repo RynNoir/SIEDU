@@ -1,10 +1,5 @@
 <?php
 
-test('example', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
-});
 use App\Models\StudyProgram;
 use App\Models\User;
 
