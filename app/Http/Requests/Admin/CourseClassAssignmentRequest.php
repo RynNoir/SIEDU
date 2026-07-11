@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\ClassGroup;
 use App\Models\Course;
+use App\Models\EvaluationPeriod;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -44,6 +45,7 @@ class CourseClassAssignmentRequest extends FormRequest
 
     /**
      * §7.1/§7.2: MK & kelas harus satu prodi, dan semester MK cocok tahun kelas.
+     * §7.8: paritas semester MK (ganjil/genap) harus cocok dengan tipe periode evaluasi.
      *
      * @return array<int, callable>
      */
@@ -66,6 +68,14 @@ class CourseClassAssignmentRequest extends FormRequest
                 $valid = [$class->year_level * 2 - 1, $class->year_level * 2];
                 if (! in_array($course->semester, $valid, true)) {
                     $validator->errors()->add('course_id', "Semester MK ({$course->semester}) tidak sesuai tahun kelas ({$class->year_level}).");
+                }
+
+                $period = EvaluationPeriod::find($this->input('evaluation_period_id'));
+                if ($period && $course->semesterType() !== $period->semester_type) {
+                    $validator->errors()->add(
+                        'evaluation_period_id',
+                        "Mata kuliah semester {$course->semester} ({$course->semesterType()->value}) tidak bisa diassign ke periode bertipe {$period->semester_type->value}. Pilih periode dengan tipe semester yang sama."
+                    );
                 }
             },
         ];

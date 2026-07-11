@@ -4,7 +4,7 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: **Fase 0–11 selesai (2026-07-12) — project SIEDU rampung + UI diperkaya.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
+**Status project saat ini**: **Fase 0–12 selesai (2026-07-12) — project SIEDU rampung, UI diperkaya, bug validasi semester-periode diperbaiki.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -219,6 +219,20 @@ Restyle/enrichment **tampilan saja** — tidak menyentuh controller, route, migr
 - [x] **Langkah 4 — Tabel datasheet (§6.3, §13.6)**: tabel `index` sudah pakai `<x-table>` (header `canvas`, border 1px tanpa zebra, hover `accent-soft`, kode `font-mono`) sejak Fase 5 — diverifikasi konsisten. Ditambah **pagination bertema token GUIDELINE** (`resources/views/vendor/pagination/tailwind.blade.php`) menggantikan default gray/indigo.
 - [x] **Langkah 5 — Auth split layout (§13.7)**: `layouts/guest` jadi dua kolom (panel identitas `bg-ink` + form), menumpuk di mobile — berlaku untuk semua halaman auth. Label login di-Indonesiakan.
 - [x] Verifikasi: `vendor/bin/pint` bersih, `php artisan test --compact` hijau (95 test, 247 assertion), `npm run build` sukses. Tanpa menyentuh business logic (hanya menambah `Admin\DashboardController` untuk data ringkasan dashboard).
+
+---
+
+## Fase 12 — Bugfix: Integrasi Semester MK ↔ Periode Evaluasi
+
+Ditemukan saat review: `CourseClassAssignmentRequest` (Fase 5) memvalidasi semester MK vs `year_level` kelas (§7.1) dan jenjang (§7.2), tapi **tidak pernah** mencocokkan paritas semester MK (ganjil/genap) dengan `evaluation_periods.semester_type` — sehingga MK semester ganjil (mis. semester 3) bisa ter-assign ke periode evaluasi bertipe genap, dan sebaliknya. Lihat PRD.md §7.8 & riwayat revisi v1.4.
+
+- [x] `Course::semesterType()` — method baru menghitung `SemesterType::Ganjil`/`Genap` dari paritas kolom `semester` (ganjil = 1,3,5,7; genap = 2,4,6,8).
+- [x] `CourseClassAssignmentRequest::after()` — tambah validasi: `course->semesterType()` harus sama dengan `evaluationPeriod->semester_type`; error jelas di field `evaluation_period_id` (GUIDELINE §6.2/§12: nada lugas, sebut semester & tipe periode yang bentrok).
+- [x] Form `admin/course-class-assignments/_form.blade.php`: dropdown periode menampilkan tipe semester (`Ganjil`/`Genap`) di label, ditambah catatan singkat aturan paritas — supaya admin sadar sebelum submit, bukan hanya ditolak sesudahnya.
+- [x] `EvaluationPeriodFactory::genap()` — state baru untuk kebutuhan test periode bertipe genap.
+- [x] Test regresi (`AssignmentTest.php`): MK ganjil ke periode genap ditolak; MK genap ke periode genap diterima.
+- [x] Diverifikasi: `CourseClassAssignmentSeeder`/`EvaluationPeriodSeeder` sudah konsisten sebelum fix (selalu pasangkan MK ganjil dengan periode "Ganjil") — tidak perlu diubah.
+- [x] Verifikasi: `vendor/bin/pint` bersih, `php artisan test --compact` hijau (99 test, 246 assertion), `migrate:fresh --seed` sukses. GUIDELINE.md tidak berubah (copy error & komponen form sudah mengikuti §6.2/§12 yang ada).
 
 ---
 

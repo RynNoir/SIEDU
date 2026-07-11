@@ -57,3 +57,35 @@ test('MK semester tak cocok tahun kelas ditolak (§7.1)', function () {
         'evaluation_period_id' => $period->id, 'lecturer_id' => $dosen->id,
     ])->assertSessionHasErrors('course_id');
 });
+
+test('MK semester ganjil tak bisa diassign ke periode genap (§7.8)', function () {
+    $admin = User::factory()->admin()->create();
+    $prodi = StudyProgram::factory()->create(['total_semesters' => 6]);
+    $class = ClassGroup::factory()->create(['study_program_id' => $prodi->id, 'year_level' => 1]);
+    $course = Course::factory()->create(['study_program_id' => $prodi->id, 'semester' => 1]); // ganjil
+    $period = EvaluationPeriod::factory()->genap()->open()->create();
+    $dosen = Lecturer::factory()->create(['study_program_id' => $prodi->id]);
+
+    $this->actingAs($admin)->post(route('admin.course-class-assignments.store'), [
+        'course_id' => $course->id, 'class_group_id' => $class->id,
+        'evaluation_period_id' => $period->id, 'lecturer_id' => $dosen->id,
+    ])->assertSessionHasErrors('evaluation_period_id');
+
+    expect(CourseClassAssignment::count())->toBe(0);
+});
+
+test('MK semester genap boleh diassign ke periode genap (§7.8)', function () {
+    $admin = User::factory()->admin()->create();
+    $prodi = StudyProgram::factory()->create(['total_semesters' => 6]);
+    $class = ClassGroup::factory()->create(['study_program_id' => $prodi->id, 'year_level' => 1]);
+    $course = Course::factory()->create(['study_program_id' => $prodi->id, 'semester' => 2]); // genap, tahun 1
+    $period = EvaluationPeriod::factory()->genap()->open()->create();
+    $dosen = Lecturer::factory()->create(['study_program_id' => $prodi->id]);
+
+    $this->actingAs($admin)->post(route('admin.course-class-assignments.store'), [
+        'course_id' => $course->id, 'class_group_id' => $class->id,
+        'evaluation_period_id' => $period->id, 'lecturer_id' => $dosen->id,
+    ])->assertRedirect();
+
+    expect(CourseClassAssignment::count())->toBe(1);
+});

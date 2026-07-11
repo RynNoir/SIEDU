@@ -36,4 +36,12 @@ class EvaluationPeriodFactory extends Factory
     {
         return $this->state(fn (array $attributes) => ['status' => PeriodStatus::Closed]);
     }
+
+    public function genap(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Genap 2025/2026',
+            'semester_type' => SemesterType::Genap,
+        ]);
+    }
 }

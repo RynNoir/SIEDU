@@ -55,7 +55,7 @@
                     @foreach ($periods as $period)
                         <option value="{{ $period->id }}"
                             @selected((int) old('evaluation_period_id', $assignment->evaluation_period_id ?? 0) === $period->id)>
-                            {{ $period->name }}
+                            {{ $period->name }} ({{ ucfirst($period->semester_type->value) }})
                         </option>
                     @endforeach
                 </x-select>
@@ -64,6 +64,7 @@
         </div>
 
         <p class="text-xs text-muted">Team teaching: untuk 2 dosen pada MK+kelas yang sama, buat penugasan terpisah dengan dosen berbeda.</p>
+        <p class="text-xs text-muted">MK semester ganjil (1,3,5,7) hanya bisa diassign ke periode ganjil; MK semester genap (2,4,6,8) hanya ke periode genap.</p>
     </div>
 
     <div class="mt-6 flex items-center gap-3">

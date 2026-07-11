@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SemesterType;
 use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,5 +41,15 @@ class Course extends Model
     public function courseClassAssignments(): HasMany
     {
         return $this->hasMany(CourseClassAssignment::class);
+    }
+
+    /**
+     * Tipe semester MK ini (ganjil/genap) berdasarkan paritas `semester`.
+     * Kurikulum paket hanya menawarkan MK di semester ganjil ATAU genap
+     * (PRD §7.8) — dipakai untuk mencocokkan dengan `evaluation_periods.semester_type`.
+     */
+    public function semesterType(): SemesterType
+    {
+        return $this->semester % 2 === 1 ? SemesterType::Ganjil : SemesterType::Genap;
     }
 }
