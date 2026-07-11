@@ -12,6 +12,12 @@ test('profile page is displayed', function () {
     $response->assertOk();
 });
 
+test('profile page renders with the shell matching the user role', function (string $factoryState) {
+    $user = User::factory()->{$factoryState}()->create();
+
+    $this->actingAs($user)->get('/profile')->assertOk();
+})->with(['admin', 'lecturer', 'kaprodi', 'student']);
+
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 

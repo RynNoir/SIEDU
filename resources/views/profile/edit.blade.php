@@ -1,29 +1,25 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-display font-semibold text-xl text-ink leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@php
+    // Profil diakses semua role — pakai shell sesuai role login agar navigasi tetap konsisten (GUIDELINE §13).
+    $layout = match (true) {
+        auth()->user()->isAdmin() => 'admin-layout',
+        auth()->user()->isLecturer() => 'lecturer-layout',
+        auth()->user()->isKaprodi() => 'kaprodi-layout',
+        default => 'student-layout',
+    };
+@endphp
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-surface border border-border rounded-card">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+<x-dynamic-component :component="$layout" header="Profil Saya">
+    <div class="max-w-2xl space-y-4">
+        <x-card>
+            @include('profile.partials.update-profile-information-form')
+        </x-card>
 
-            <div class="p-4 sm:p-8 bg-surface border border-border rounded-card">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
+        <x-card>
+            @include('profile.partials.update-password-form')
+        </x-card>
 
-            <div class="p-4 sm:p-8 bg-surface border border-border rounded-card">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+        <x-card>
+            @include('profile.partials.delete-user-form')
+        </x-card>
     </div>
-</x-app-layout>
+</x-dynamic-component>
