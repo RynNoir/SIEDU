@@ -8,6 +8,7 @@ use App\Models\EvaluationAnswer;
 use App\Models\EvaluationPeriod;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -57,12 +58,42 @@ class DashboardController extends Controller
             ->where('evaluations.course_class_assignment_id', $assignment->id)
             ->avg('evaluation_answers.star_rating');
 
+        $threshold = (int) config('evaluation.anonymity_min_respondents');
+        $ratingFilter = $request->input('rating'); // null | high | mid | low
+        $impressions = collect();
+
+        if ($respondents >= $threshold) {
+            // PENTING: select eksplisit — TIDAK PERNAH student_id.
+            $rows = DB::table('evaluation_impressions as i')
+                ->join('evaluations as e', 'i.evaluation_id', '=', 'e.id')
+                ->where('e.course_class_assignment_id', $assignment->id)
+                ->where(fn ($q) => $q->whereNotNull('i.impression_text')->orWhereNotNull('i.suggestion_text'))
+                ->selectRaw('i.impression_text, i.suggestion_text, (SELECT AVG(star_rating) FROM evaluation_answers a WHERE a.evaluation_id = e.id) as avg_rating')
+                ->get();
+
+            $impressions = collect($rows)->when($ratingFilter, function ($items) use ($ratingFilter) {
+                return $items->filter(function ($r) use ($ratingFilter): bool {
+                    $avg = (float) $r->avg_rating;
+
+                    return match ($ratingFilter) {
+                        'high' => $avg >= 4,
+                        'mid' => $avg >= 3 && $avg < 4,
+                        'low' => $avg < 3,
+                        default => true,
+                    };
+                });
+            })->values();
+        }
+
         return view('lecturer.assignments.show', [
             'assignment' => $assignment,
             'respondents' => $respondents,
             'classSize' => $classSize,
             'categoryScores' => $categoryScores,
             'overallAvg' => $overallAvg,
+            'threshold' => $threshold,
+            'impressions' => $impressions,
+            'ratingFilter' => $ratingFilter,
         ]);
     }
 }
