@@ -150,15 +150,15 @@ Implementasi PRD §6.1. Service class + command Artisan + (opsional) tombol admi
 
 Grup route `student`. Inti anti-submit-ganda & jalur team teaching. **Ikuti wireframe GUIDELINE.md §4.2 (Form Evaluasi Mahasiswa) dan elemen signature §5 (Rating Gauge).**
 
-- [ ] Halaman daftar evaluasi: query `course_class_assignments` dengan `class_group_id` = kelas mahasiswa saat ini pada periode `open`. Tandai mana yang **sudah** vs **belum** diisi (join ke `evaluations`).
-- [ ] **Team teaching**: tiap baris assignment = satu kartu evaluasi terpisah. Label jelas "Nama MK — Nama Dosen" (PRD §6.3.4).
-- [ ] Form evaluasi per assignment: semua `evaluation_questions` aktif (rating gauge 1–5, wajib semua) + 2 textarea kesan & saran (nullable), label "Kesan"/"Saran" terpisah (GUIDELINE.md §6.5).
-- [ ] **Komponen `<x-rating-gauge>` (GUIDELINE.md §5)**: 5 notch/diamond (⬥), BUKAN bintang (★) — kosong = `color-border`, terisi = `color-rating` (amber), transisi hover/pilih 150–200ms (§8 Motion). Mode interaktif untuk form ini; tampilkan skor numerik `text-mono-data` di samping (misal "4 / 5"). Wajib bisa diakses via keyboard (Tab + Enter/Space, GUIDELINE.md §9) dan target sentuh ≥44×44px di mobile.
-- [ ] Submit handler: buat `evaluation` + `evaluation_answers` + `evaluation_impression` dalam 1 transaction; set `submitted_at`. Tolak jika sudah pernah submit (unique constraint + cek eksplisit).
-- [ ] Guard: mahasiswa hanya bisa mengisi assignment untuk kelasnya sendiri & periode `open`; tolak akses assignment lain.
-- [ ] Tombol submit berlabel aksi konkret **"Kirim Evaluasi"** (GUIDELINE.md §6.1, §12) — bukan "Submit"/"OK"; pesan error validasi eksplisit misal "Semua pertanyaan wajib diberi nilai sebelum mengirim" (§12).
-- [ ] Responsif mobile (GUIDELINE.md §10): form single-column penuh, gauge rating diperbesar untuk mudah ditekan jempol, sidebar berubah jadi bottom nav sederhana khusus role mahasiswa.
-- [ ] Feature test: submit sukses, cegah submit ganda, team teaching muncul sebagai 2 form, akses lintas-kelas ditolak.
+- [x] Halaman daftar evaluasi: query `course_class_assignments` dengan `class_group_id` = kelas mahasiswa saat ini pada periode `open`. Tandai mana yang **sudah** vs **belum** diisi (join ke `evaluations`).
+- [x] **Team teaching**: tiap baris assignment = satu kartu evaluasi terpisah. Label jelas "Nama MK — Nama Dosen" (PRD §6.3.4).
+- [x] Form evaluasi per assignment: semua `evaluation_questions` aktif (rating gauge 1–5, wajib semua) + 2 textarea kesan & saran (nullable), label "Kesan"/"Saran" terpisah (GUIDELINE.md §6.5).
+- [x] **Komponen `<x-rating-gauge>` (GUIDELINE.md §5)**: 5 notch/diamond (⬥), BUKAN bintang (★) — kosong = `color-border`, terisi = `color-rating` (amber), transisi hover/pilih 150–200ms (§8 Motion). Mode interaktif untuk form ini; tampilkan skor numerik `text-mono-data` di samping (misal "4 / 5"). Wajib bisa diakses via keyboard (Tab + Enter/Space, GUIDELINE.md §9) dan target sentuh ≥44×44px di mobile.
+- [x] Submit handler: buat `evaluation` + `evaluation_answers` + `evaluation_impression` dalam 1 transaction; set `submitted_at`. Tolak jika sudah pernah submit (unique constraint + cek eksplisit).
+- [x] Guard: mahasiswa hanya bisa mengisi assignment untuk kelasnya sendiri & periode `open`; tolak akses assignment lain.
+- [x] Tombol submit berlabel aksi konkret **"Kirim Evaluasi"** (GUIDELINE.md §6.1, §12) — bukan "Submit"/"OK"; pesan error validasi eksplisit misal "Semua pertanyaan wajib diberi nilai sebelum mengirim" (§12).
+- [x] Responsif mobile (GUIDELINE.md §10): form single-column penuh, gauge rating diperbesar untuk mudah ditekan jempol, sidebar berubah jadi bottom nav sederhana khusus role mahasiswa.
+- [x] Feature test: submit sukses, cegah submit ganda, team teaching muncul sebagai 2 form, akses lintas-kelas ditolak.
 
 ---
 
