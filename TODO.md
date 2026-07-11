@@ -183,12 +183,12 @@ Grup route `lecturer`. **Kritis: anonimitas — `student_id` tidak boleh muncul 
 
 PRD §6.5 awalnya menyebut kaprodi opsional; **project ini menetapkan kaprodi sebagai role wajib/terpisah** (perluasan dari PRD 12-tabel asli — lihat catatan di bawah). Kolom `users.study_program_id` sudah dibuat di Fase 1 dan model di-set di Fase 2; fase ini fokus ke UI/dashboard-nya.
 
-- [ ] Middleware role: `kaprodi` sudah masuk daftar role tervalidasi (Fase 4) — pastikan grup route `kaprodi` dipisah dari `admin`.
-- [ ] Dashboard agregasi level prodi: filter per dosen, per periode — query dibatasi ke `study_program_id` milik kaprodi login (`auth()->user()->study_program_id`). **Reuse komponen visual dashboard dosen dari Fase 8** (kartu ringkasan, rating gauge display-only, filter chip GUIDELINE.md §6.6) supaya konsisten secara visual, tinggal ganti sumber data jadi agregat lintas-dosen.
-- [ ] Perbandingan skor antar dosen yang mengampu MK sama di kelas paralel (dalam prodi yang sama) — tabel ringkas mengikuti GUIDELINE.md §6.3 (tanpa zebra-stripe, kolom kode kelas pakai `text-mono-data`).
-- [ ] Tetap patuhi anonimitas & threshold (kesan & saran ≥5 responden, tanpa `student_id`); empty state & copy sensitif mengikuti GUIDELINE.md §6.7 dan §12 (sama seperti Fase 8).
-- [ ] Authorization: kaprodi tidak bisa mengakses data prodi lain (Policy/gate).
-- [ ] Feature test: kaprodi hanya lihat data prodinya, threshold & anonimitas tetap berlaku.
+- [x] Middleware role: `kaprodi` sudah masuk daftar role tervalidasi (Fase 4) — pastikan grup route `kaprodi` dipisah dari `admin`.
+- [x] Dashboard agregasi level prodi: filter per dosen, per periode — query dibatasi ke `study_program_id` milik kaprodi login (`auth()->user()->study_program_id`). **Reuse komponen visual dashboard dosen dari Fase 8** (kartu ringkasan, rating gauge display-only, filter chip GUIDELINE.md §6.6) supaya konsisten secara visual, tinggal ganti sumber data jadi agregat lintas-dosen.
+- [x] Perbandingan skor antar dosen yang mengampu MK sama di kelas paralel (dalam prodi yang sama) — tabel ringkas mengikuti GUIDELINE.md §6.3 (tanpa zebra-stripe, kolom kode kelas pakai `text-mono-data`).
+- [x] Tetap patuhi anonimitas & threshold (kesan & saran ≥5 responden, tanpa `student_id`); empty state & copy sensitif mengikuti GUIDELINE.md §6.7 dan §12 (sama seperti Fase 8).
+- [x] Authorization: kaprodi tidak bisa mengakses data prodi lain (Policy/gate).
+- [x] Feature test: kaprodi hanya lihat data prodinya, threshold & anonimitas tetap berlaku.
 
 ---
 
