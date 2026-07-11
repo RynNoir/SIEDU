@@ -52,8 +52,9 @@ Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', fn () => redirect()->route('student.evaluations.index'))->name('dashboard');
-    Route::view('/dashboard', 'student.dashboard')->name('dashboard');
     Route::get('evaluations', [EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('evaluations/{assignment}', [EvaluationController::class, 'show'])->name('evaluations.show');
+    Route::post('evaluations/{assignment}', [EvaluationController::class, 'store'])->name('evaluations.store');
 });
 
 Route::middleware(['auth', 'role:kaprodi'])->prefix('kaprodi')->name('kaprodi.')->group(function () {
