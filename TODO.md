@@ -4,7 +4,7 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: Fase 0 & Fase 1 selesai (2026-07-05). Fase 0: Laravel 13 + MySQL (`siedu`), Laravel Breeze (Blade stack) terpasang, Tailwind v4 + design token GUIDELINE.md aktif, font Space Grotesk/IBM Plex ter-import, `config/evaluation.php` dibuat. Fase 1: seluruh 12 migration tabel domain PRD sudah dibuat (1 commit per tabel), `php artisan migrate` sukses, FK & unique constraint terverifikasi via `information_schema`. Siap lanjut ke Fase 2 (Models & Relationships).
+**Status project saat ini**: **Fase 0–10 selesai (2026-07-12) — project SIEDU rampung.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -194,18 +194,18 @@ PRD §6.5 awalnya menyebut kaprodi opsional; **project ini menetapkan kaprodi se
 
 ## Fase 10 — Polish, Validasi Menyeluruh & Testing E2E
 
-- [ ] Konsistensi UI: audit seluruh halaman terhadap GUIDELINE.md — token warna (§2) dipakai sesuai peran (accent hanya elemen interaktif, amber hanya rating, status color hanya badge), tipografi (§3) konsisten (Space Grotesk judul, IBM Plex Sans body, IBM Plex Mono untuk NIM/kode kelas/kode MK di semua tempat termasuk dropdown/chip).
-- [ ] Layout & sidebar per role (§4.1, §10): sidebar tetap desktop ≥1024px, collapse-icon tablet 768–1023px, bottom-nav mobile <768px khusus mahasiswa.
-- [ ] Motion (§8): transisi hover/fokus/dropdown 150–200ms ease-out, tanpa animasi dekoratif; hormati `prefers-reduced-motion`.
-- [ ] Aksesibilitas (§9): kontras WCAG AA, semua elemen interaktif (termasuk rating gauge) bisa diakses keyboard, target sentuh ≥44×44px mobile, badge status selalu sertakan label teks bukan warna saja.
-- [ ] Copy/microcopy (§12): audit label tombol pakai kata kerja aktif & konsisten dengan notifikasi hasil (misal "Simpan Evaluasi" → "Evaluasi Tersimpan"), istilah yang dikenal pengguna bukan istilah teknis sistem.
-- [ ] Validasi form lengkap + pesan error ramah (bahasa Indonesia, langsung ke inti masalah — GUIDELINE.md §6.2, §12).
-- [ ] Review keamanan: cek ulang tidak ada kebocoran `student_id`; middleware role menutup semua route; mass-assignment aman.
-- [ ] Jalankan `vendor/bin/pint --format agent` untuk seluruh PHP.
-- [ ] Suite Pest E2E: alur penuh admin→assign→mahasiswa isi→dosen lihat hasil; jalur team teaching; promosi kelas.
-- [ ] `php artisan test --compact` hijau.
-- [ ] (Opsional) Browser/smoke test halaman utama tiap role (Pest 4 browser) untuk cek error JS.
-- [ ] `npm run build` untuk aset produksi.
+- [x] Konsistensi UI: audit seluruh halaman terhadap GUIDELINE.md — token warna (§2) dipakai sesuai peran (accent hanya elemen interaktif, amber hanya rating, status color hanya badge), tipografi (§3) konsisten (Space Grotesk judul, IBM Plex Sans body, IBM Plex Mono untuk NIM/kode kelas/kode MK di semua tempat termasuk dropdown/chip). Seluruh komponen Breeze bawaan yang masih terpakai (button, dropdown, modal, layout, halaman auth & profile) direstyle dari palet default Tailwind ke token GUIDELINE; view mati (`dashboard.blade.php`, `student/dashboard.blade.php`, `welcome.blade.php`) dihapus.
+- [x] Layout & sidebar per role (§4.1, §10): sidebar tetap desktop ≥1024px, collapse-icon tablet 768–1023px, bottom-nav mobile <768px khusus mahasiswa. (Dibangun Fase 5/7/8/9, diverifikasi ulang di audit ini.)
+- [x] Motion (§8): transisi hover/fokus/dropdown 150–200ms ease-out, tanpa animasi dekoratif; hormati `prefers-reduced-motion` (blok `@media (prefers-reduced-motion: reduce)` ditambahkan di `app.css`).
+- [x] Aksesibilitas (§9): kontras WCAG AA, semua elemen interaktif (termasuk rating gauge) bisa diakses keyboard, target sentuh ≥44×44px mobile, badge status selalu sertakan label teks bukan warna saja. (Dibangun Fase 5/7, diverifikasi ulang di audit ini.)
+- [x] Copy/microcopy (§12): audit label tombol pakai kata kerja aktif & konsisten dengan notifikasi hasil (misal "Simpan Evaluasi" → "Evaluasi Tersimpan"), istilah yang dikenal pengguna bukan istilah teknis sistem.
+- [x] Validasi form lengkap + pesan error ramah (bahasa Indonesia, langsung ke inti masalah — GUIDELINE.md §6.2, §12).
+- [x] Review keamanan: cek ulang tidak ada kebocoran `student_id` (grep bersih di `resources/views/` + `SecurityTest`); middleware role menutup semua route (dataset test); mass-assignment aman (semua model punya `#[Fillable]`); `.env` tidak ter-commit.
+- [x] Jalankan `vendor/bin/pint --format agent` untuk seluruh PHP.
+- [x] Suite Pest E2E: alur penuh admin→assign→mahasiswa isi→dosen lihat hasil; jalur team teaching; promosi kelas (`EndToEndFlowTest`). Ditambah `ArchTest` (no debug leftover, suffix Controller/Request, enum).
+- [x] `php artisan test --compact` hijau (93 test, 242 assertion).
+- [ ] (Opsional) Browser/smoke test halaman utama tiap role (Pest 4 browser) untuk cek error JS. **Dilewati** — butuh instalasi `pestphp/pest-plugin-browser` + Playwright (dependency baru), di luar cakupan otomatis sesi ini.
+- [x] `npm run build` untuk aset produksi.
 
 ---
 
