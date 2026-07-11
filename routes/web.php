@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\LecturerController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\StudyProgramController;
 use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\Kaprodi\DashboardController as KaprodiDashboardController;
 use App\Http\Controllers\Lecturer\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\EvaluationController;
@@ -60,7 +61,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 });
 
 Route::middleware(['auth', 'role:kaprodi'])->prefix('kaprodi')->name('kaprodi.')->group(function () {
-    Route::view('/dashboard', 'kaprodi.dashboard')->name('dashboard');
+    Route::get('/dashboard', [KaprodiDashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/auth.php';
