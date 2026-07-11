@@ -12,6 +12,14 @@ class CourseClassAssignmentPolicy
      */
     public function view(User $user, CourseClassAssignment $assignment): bool
     {
-        return $user->isLecturer() && $assignment->lecturer_id === $user->lecturer?->id;
+        if ($user->isLecturer()) {
+            return $assignment->lecturer_id === $user->lecturer?->id;
+        }
+
+        if ($user->isKaprodi()) {
+            return $assignment->classGroup->study_program_id === $user->study_program_id;
+        }
+
+        return false;
     }
 }

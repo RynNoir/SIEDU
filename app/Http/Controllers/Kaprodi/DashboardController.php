@@ -7,7 +7,9 @@ use App\Models\CourseClassAssignment;
 use App\Models\EvaluationAnswer;
 use App\Models\EvaluationPeriod;
 use App\Models\Lecturer;
+use App\Services\AssignmentResultService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -41,6 +43,19 @@ class DashboardController extends Controller
             'periods' => EvaluationPeriod::orderByDesc('start_date')->get(),
             'lecturerId' => $lecturerId,
             'periodId' => $periodId,
+        ]);
+    }
+
+    public function show(Request $request, CourseClassAssignment $assignment, AssignmentResultService $results): View
+    {
+        Gate::authorize('view', $assignment);
+
+        $assignment->load(['course', 'lecturer', 'classGroup', 'evaluationPeriod']);
+
+        return view('kaprodi.assignments.show', [
+            'assignment' => $assignment,
+            'ratingFilter' => $request->input('rating'),
+            ...$results->for($assignment, $request->input('rating')),
         ]);
     }
 }

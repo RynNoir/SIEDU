@@ -62,6 +62,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 
 Route::middleware(['auth', 'role:kaprodi'])->prefix('kaprodi')->name('kaprodi.')->group(function () {
     Route::get('/dashboard', [KaprodiDashboardController::class, 'index'])->name('dashboard');
+    Route::get('assignments/{assignment}', [KaprodiDashboardController::class, 'show'])->name('assignments.show');
 });
 
 require __DIR__.'/auth.php';
