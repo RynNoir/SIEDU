@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Request\Admin\ClassGroupRequest;
+use App\Http\Requests\Admin\ClassGroupRequest;
 use App\Models\ClassGroup;
+use App\Models\StudyProgram;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 

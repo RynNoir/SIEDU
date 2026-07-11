@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\DegreeLevel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StudyProgramRequest extends FormRequest
 {
