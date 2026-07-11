@@ -166,16 +166,16 @@ Grup route `student`. Inti anti-submit-ganda & jalur team teaching. **Ikuti wire
 
 Grup route `lecturer`. **Kritis: anonimitas — `student_id` tidak boleh muncul di query/response manapun.** **Ikuti wireframe GUIDELINE.md §4.3 (Dashboard Dosen).**
 
-- [ ] Dashboard: daftar MK/kelas yang diampu dosen login (dari `course_class_assignments` di mana `lecturer_id` = dosen ini).
-- [ ] Skor rata-rata **per kategori pertanyaan** (agregasi `evaluation_answers.star_rating` di-group per `evaluation_questions.category`), plus rata-rata keseluruhan & jumlah responden — tampilkan sebagai kartu ringkasan (`text-display-l` untuk angka besar) sesuai wireframe §4.3.
-- [ ] Skor per kategori ditampilkan sebagai **bar horizontal proporsional (Rating Gauge mode display-only, GUIDELINE.md §5)** di bawah label kategori, bukan gauge interaktif — beri kesan "meter", bukan "rating toko online".
-- [ ] Daftar kesan & saran anonim per assignment sebagai **kartu (GUIDELINE.md §6.5)**: border 1px + radius 8px, badge kecil **"Anonim"** di pojok kartu, rating gauge kecil berdampingan, teks Kesan/Saran sebagai 2 blok terpisah berlabel (bukan satu paragraf gabungan). **Jangan** select/expose `student_id`.
-- [ ] Filter per kelas/periode/rentang rating ditampilkan sebagai **chip dropdown horizontal** di atas konten (GUIDELINE.md §6.6), bukan sidebar filter terpisah.
-- [ ] **Threshold anonimitas**: kesan & saran hanya tampil bila jumlah `evaluations` pada assignment ≥ `config('evaluation.anonymity_min_respondents')` (default 5). Bila belum, tampilkan empty state persis nada GUIDELINE.md §6.7: *"Kesan & saran akan tampil setelah minimal 5 mahasiswa mengisi evaluasi untuk kelas ini."*
-- [ ] Larang filter granular yang bisa mengidentifikasi individu (PRD §7.6) — hanya sediakan filter yang diizinkan.
-- [ ] Authorization: dosen hanya melihat data assignment miliknya (Policy/gate).
-- [ ] Copy nada netral-informatif untuk data sensitif (GUIDELINE.md §12): misal "Kesan & saran ditampilkan tanpa identitas mahasiswa" — bukan nada defensif/berlebihan.
-- [ ] Feature test: agregasi skor benar, kesan tersembunyi di bawah threshold, `student_id` tidak ada di response, dosen lain tak bisa lihat data bukan miliknya.
+- [x] Dashboard: daftar MK/kelas yang diampu dosen login (dari `course_class_assignments` di mana `lecturer_id` = dosen ini).
+- [x] Skor rata-rata **per kategori pertanyaan** (agregasi `evaluation_answers.star_rating` di-group per `evaluation_questions.category`), plus rata-rata keseluruhan & jumlah responden — tampilkan sebagai kartu ringkasan (`text-display-l` untuk angka besar) sesuai wireframe §4.3.
+- [x] Skor per kategori ditampilkan sebagai **bar horizontal proporsional (Rating Gauge mode display-only, GUIDELINE.md §5)** di bawah label kategori, bukan gauge interaktif — beri kesan "meter", bukan "rating toko online".
+- [x] Daftar kesan & saran anonim per assignment sebagai **kartu (GUIDELINE.md §6.5)**: border 1px + radius 8px, badge kecil **"Anonim"** di pojok kartu, rating gauge kecil berdampingan, teks Kesan/Saran sebagai 2 blok terpisah berlabel (bukan satu paragraf gabungan). **Jangan** select/expose `student_id`.
+- [x] Filter per kelas/periode/rentang rating ditampilkan sebagai **chip dropdown horizontal** di atas konten (GUIDELINE.md §6.6), bukan sidebar filter terpisah.
+- [x] **Threshold anonimitas**: kesan & saran hanya tampil bila jumlah `evaluations` pada assignment ≥ `config('evaluation.anonymity_min_respondents')` (default 5). Bila belum, tampilkan empty state persis nada GUIDELINE.md §6.7: *"Kesan & saran akan tampil setelah minimal 5 mahasiswa mengisi evaluasi untuk kelas ini."*
+- [x] Larang filter granular yang bisa mengidentifikasi individu (PRD §7.6) — hanya sediakan filter yang diizinkan.
+- [x] Authorization: dosen hanya melihat data assignment miliknya (Policy/gate).
+- [x] Copy nada netral-informatif untuk data sensitif (GUIDELINE.md §12): misal "Kesan & saran ditampilkan tanpa identitas mahasiswa" — bukan nada defensif/berlebihan.
+- [x] Feature test: agregasi skor benar, kesan tersembunyi di bawah threshold, `student_id` tidak ada di response, dosen lain tak bisa lihat data bukan miliknya.
 
 ---
 
