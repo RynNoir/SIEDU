@@ -10,17 +10,27 @@ use App\Models\CourseClassAssignment;
 use App\Models\EvaluationPeriod;
 use App\Models\Lecturer;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CourseClassAssignmentController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $assignments = CourseClassAssignment::with(['course', 'lecturer', 'classGroup', 'evaluationPeriod'])
+        $assignments = CourseClassAssignment::query()
+            ->with(['course', 'lecturer', 'classGroup', 'evaluationPeriod'])
+            ->when($request->input('course_id'), fn ($q, $id) => $q->where('course_id', $id))
+            ->when($request->input('lecturer_id'), fn ($q, $id) => $q->where('lecturer_id', $id))
+            ->when($request->input('class_group_id'), fn ($q, $id) => $q->where('class_group_id', $id))
+            ->when($request->input('evaluation_period_id'), fn ($q, $id) => $q->where('evaluation_period_id', $id))
             ->latest('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('admin.course-class-assignments.index', compact('assignments'));
+        return view('admin.course-class-assignments.index', [
+            'assignments' => $assignments,
+            ...$this->formData(),
+        ]);
     }
 
     public function create(): View

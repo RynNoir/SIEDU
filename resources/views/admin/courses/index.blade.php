@@ -4,8 +4,34 @@
         <x-button :href="route('admin.courses.create')">Tambah Mata Kuliah</x-button>
     </div>
 
+    {{-- Filter live: dropdown auto-submit, cari didebounce (GUIDELINE §6.6) --}}
+    <form method="GET" class="mb-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <x-text-input name="search" placeholder="Cari kode / nama mata kuliah"
+                :value="request('search')" x-on:input.debounce.400ms="$el.form.submit()" />
+            <x-select name="study_program_id" onchange="this.form.submit()">
+                <option value="">Semua Prodi</option>
+                @foreach ($studyPrograms as $prodi)
+                    <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
+                @endforeach
+            </x-select>
+            <x-select name="semester" onchange="this.form.submit()">
+                <option value="">Semua Semester</option>
+                @foreach ($semesters as $sem)
+                    <option value="{{ $sem }}" @selected((string) request('semester') === (string) $sem)>Semester {{ $sem }}</option>
+                @endforeach
+            </x-select>
+        </div>
+        <div class="mt-2 flex items-center gap-2">
+            <button type="submit" class="sr-only">Filter</button>
+            @if (request()->hasAny(['search', 'study_program_id', 'semester']))
+                <x-button variant="secondary" :href="route('admin.courses.index')">Reset</x-button>
+            @endif
+        </div>
+    </form>
+
     @if ($courses->isEmpty())
-        <x-empty-state message="Belum ada mata kuliah. Tambahkan kurikulum paket per prodi." />
+        <x-empty-state message="Tidak ada mata kuliah yang cocok. Coba ubah filter atau tambahkan mata kuliah baru." />
     @else
         <x-table>
             <x-slot name="head">

@@ -4,8 +4,28 @@
         <x-button :href="route('admin.lecturers.create')">Tambah Dosen</x-button>
     </div>
 
+    {{-- Filter live: dropdown auto-submit, cari didebounce (GUIDELINE §6.6) --}}
+    <form method="GET" class="mb-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <x-text-input name="search" placeholder="Cari NIP / nama / email"
+                :value="request('search')" x-on:input.debounce.400ms="$el.form.submit()" />
+            <x-select name="study_program_id" onchange="this.form.submit()">
+                <option value="">Semua Prodi</option>
+                @foreach ($studyPrograms as $prodi)
+                    <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
+                @endforeach
+            </x-select>
+        </div>
+        <div class="mt-2 flex items-center gap-2">
+            <button type="submit" class="sr-only">Filter</button>
+            @if (request()->hasAny(['search', 'study_program_id']))
+                <x-button variant="secondary" :href="route('admin.lecturers.index')">Reset</x-button>
+            @endif
+        </div>
+    </form>
+
     @if ($lecturers->isEmpty())
-        <x-empty-state message="Belum ada dosen. Tambahkan akun dosen (akan dibuat dengan password default)." />
+        <x-empty-state message="Tidak ada dosen yang cocok. Coba ubah filter atau tambahkan dosen baru." />
     @else
         <x-table>
             <x-slot name="head">

@@ -9,17 +9,33 @@ use App\Models\Lecturer;
 use App\Models\StudyProgram;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class LecturerController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $lecturers = Lecturer::with(['user', 'studyProgram'])->orderBy('name')->paginate(20);
+        $lecturers = Lecturer::query()
+            ->with(['user', 'studyProgram'])
+            ->when($request->input('search'), function ($query, $search): void {
+                $query->where(function ($q) use ($search): void {
+                    $q->where('nip', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn ($u) => $u->where('email', 'like', "%{$search}%"));
+                });
+            })
+            ->when($request->input('study_program_id'), fn ($q, $id) => $q->where('study_program_id', $id))
+            ->orderBy('name')
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('admin.lecturers.index', compact('lecturers'));
+        return view('admin.lecturers.index', [
+            'lecturers' => $lecturers,
+            'studyPrograms' => StudyProgram::orderBy('code')->get(),
+        ]);
     }
 
     public function create(): View

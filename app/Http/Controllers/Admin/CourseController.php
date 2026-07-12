@@ -7,18 +7,32 @@ use App\Http\Requests\Admin\CourseRequest;
 use App\Models\Course;
 use App\Models\StudyProgram;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $courses = Course::with('studyProgram')
+        $courses = Course::query()
+            ->with('studyProgram')
+            ->when($request->input('search'), function ($query, $search): void {
+                $query->where(function ($q) use ($search): void {
+                    $q->where('code', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->input('study_program_id'), fn ($q, $id) => $q->where('study_program_id', $id))
+            ->when($request->input('semester'), fn ($q, $semester) => $q->where('semester', $semester))
             ->orderBy('study_program_id')
             ->orderBy('semester')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('admin.courses.index', compact('courses'));
+        return view('admin.courses.index', [
+            'courses' => $courses,
+            'studyPrograms' => StudyProgram::orderBy('code')->get(),
+            'semesters' => range(1, 8),
+        ]);
     }
 
     public function create(): View

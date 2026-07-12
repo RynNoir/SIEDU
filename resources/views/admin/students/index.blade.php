@@ -4,32 +4,36 @@
         <x-button :href="route('admin.students.create')">Tambah Mahasiswa</x-button>
     </div>
 
-    {{-- Filter bar (chip dropdown horizontal, GUIDELINE §6.6) --}}
-    <form method="GET" class="mb-4 flex flex-wrap items-center gap-2">
-        <x-text-input name="search" class="w-56" placeholder="Cari NIM / nama"
-            :value="request('search')" />
-        <x-select name="study_program_id" class="w-auto">
-            <option value="">Semua Prodi</option>
-            @foreach ($studyPrograms as $prodi)
-                <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
-            @endforeach
-        </x-select>
-        <x-select name="class_group_id" class="w-auto">
-            <option value="">Semua Kelas</option>
-            @foreach ($classGroups as $class)
-                <option value="{{ $class->id }}" @selected(request('class_group_id') == $class->id)>{{ $class->class_code }}</option>
-            @endforeach
-        </x-select>
-        <x-select name="status" class="w-auto">
-            <option value="">Semua Status</option>
-            @foreach ($statuses as $status)
-                <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ ucfirst($status->value) }}</option>
-            @endforeach
-        </x-select>
-        <x-button type="submit" variant="secondary">Filter</x-button>
-        @if (request()->hasAny(['search', 'study_program_id', 'class_group_id', 'status']))
-            <x-button variant="secondary" :href="route('admin.students.index')">Reset</x-button>
-        @endif
+    {{-- Filter live: dropdown auto-submit, cari didebounce (GUIDELINE §6.6) --}}
+    <form method="GET" class="mb-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <x-text-input name="search" placeholder="Cari NIM / nama"
+                :value="request('search')" x-on:input.debounce.400ms="$el.form.submit()" />
+            <x-select name="study_program_id" onchange="this.form.submit()">
+                <option value="">Semua Prodi</option>
+                @foreach ($studyPrograms as $prodi)
+                    <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
+                @endforeach
+            </x-select>
+            <x-select name="class_group_id" onchange="this.form.submit()">
+                <option value="">Semua Kelas</option>
+                @foreach ($classGroups as $class)
+                    <option value="{{ $class->id }}" @selected(request('class_group_id') == $class->id)>{{ $class->class_code }}</option>
+                @endforeach
+            </x-select>
+            <x-select name="status" onchange="this.form.submit()">
+                <option value="">Semua Status</option>
+                @foreach ($statuses as $status)
+                    <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ ucfirst($status->value) }}</option>
+                @endforeach
+            </x-select>
+        </div>
+        <div class="mt-2 flex items-center gap-2">
+            <button type="submit" class="sr-only">Filter</button>
+            @if (request()->hasAny(['search', 'study_program_id', 'class_group_id', 'status']))
+                <x-button variant="secondary" :href="route('admin.students.index')">Reset</x-button>
+            @endif
+        </div>
     </form>
 
     @if ($students->isEmpty())
