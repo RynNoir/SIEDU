@@ -22,7 +22,7 @@
         </div>
 
         <div class="mt-6 flex justify-end">
-            <x-primary-button>{{ __('Simpan Password') }}</x-primary-button>
+            <x-button>{{ __('Simpan Password') }}</x-button>
         </div>
     </form>
 

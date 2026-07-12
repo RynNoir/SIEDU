@@ -1,8 +1,8 @@
-{{-- Header bg-canvas, tanpa zebra-stripe, shadow+radius besar (bukan border) ala Elegent. --}}
-<div class="overflow-x-auto rounded-card bg-surface shadow-md">
+{{-- Header bg-canvas sticky (§6.3), tanpa zebra-stripe, shadow+radius besar. Baris hover accent-soft. --}}
+<div class="max-h-[70vh] overflow-auto rounded-card bg-surface shadow-md">
     <table class="min-w-full border-collapse text-sm">
-        <thead class="bg-canvas">
-            <tr class="text-left">
+        <thead class="sticky top-0 z-10 bg-canvas">
+            <tr class="text-left shadow-[0_1px_0_0_var(--color-border)]">
                 {{ $head }}
             </tr>
         </thead>

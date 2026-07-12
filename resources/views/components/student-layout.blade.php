@@ -53,9 +53,10 @@
         @endif
 
         @if (session('success'))
-            <div class="mb-4 rounded-card border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
-                {{ session('success') }}
-            </div>
+            <x-alert type="success" class="mb-4">{{ session('success') }}</x-alert>
+        @endif
+        @if (session('error'))
+            <x-alert type="error" class="mb-4">{{ session('error') }}</x-alert>
         @endif
 
         {{ $slot }}

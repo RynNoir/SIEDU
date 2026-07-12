@@ -394,3 +394,16 @@ Branch terpisah yang mengganti struktur UI menjadi **semirip mungkin dengan refe
 - **Halaman auth**: dari split full-height jadi **kartu mengambang terpusat** (`max-w-4xl`, `shadow-xl`, dua kolom di dalamnya) — meniru proporsi kartu login Elegent (960×560) alih-alih split penuh layar.
 
 **Yang TIDAK berubah** (identik dengan `master`/§1–§12): seluruh token warna §2, tipografi §3, elemen signature Rating Gauge §5, aturan aksesibilitas §9, motion §8, business logic, skema database, dan struktur fitur PRD.
+
+### 14.1 Pemolesan Kualitas Produk (polish pass, dalam GUIDELINE)
+
+Peningkatan kualitas UX/craft ke standar produk (Linear/Stripe-grade) **tanpa mengubah identitas** — palet/font/filosofi tetap. Semua mengikuti product-register: satu kosakata komponen, semantic states, feedback yang jelas.
+
+- **Motion (§8)**: token easing `--ease-out-quart`/`--ease-out-expo`. Tombol dapat `:active` press (`scale-0.97`) + hover-lift; input/select transisi border/ring; kartu-link `hover:-translate-y-0.5`. Semua ≤200ms, hormati `prefers-reduced-motion`.
+- **State komponen lengkap**: setiap elemen interaktif punya default/hover/**focus-visible**/active/disabled. Fokus keyboard pakai `focus-visible` (ring accent + offset), bukan `focus` polos, agar mouse tak memicu ring.
+- **Feedback (checklist #13/#23)**: komponen `<x-alert>` (success/error/warning/info — ikon + warna semantik + dismiss). Flash `session('success')` **dan** `session('error')` dirender di semua shell. Submit form mutasi memberi spinner + `aria-busy` (progressive enhancement `app.js`, hormati confirm() & form GET).
+- **Empty state (§6.7)**: `<x-empty-state>` kini ikon + judul opsional + slot CTA.
+- **Aksesibilitas (§9)**: `--color-muted` dinaikkan `#6B7688`→`#64707F` agar teks kecil lolos WCAG AA (≥4.5:1) di atas `canvas`. Fokus keyboard terlihat konsisten.
+- **Konsistensi (§6.1)**: sistem tombol tunggal `<x-button>` — komponen legacy `x-primary/secondary/danger-button` dipensiunkan; halaman auth memakai `<x-button>` + copy Indonesia.
+- **Tabel (§6.3)**: header **sticky** dalam kontainer scroll ber-tinggi-batas (`max-h-[70vh]`).
+- **Dark-mode ready (checklist #24)**: seluruh komponen sudah token-based (`bg-surface`/`text-ink`/dst), sehingga tema gelap tinggal menambah override token di masa depan tanpa menyentuh markup. Tidak diaktifkan sekarang.

@@ -254,6 +254,19 @@ Keputusan yang dikonfirmasi user sebelum implementasi: **(1)** chart tanpa libra
 - [x] Verifikasi: `php artisan test --compact` hijau (99 test — tanpa regresi, murni perubahan visual), `vendor/bin/pint` bersih, `npm run build` sukses.
 - [ ] **Keputusan akhir**: merge ke `master` atau tetap jadi alternatif untuk dibandingkan — menunggu review visual dari user (`npm run dev`, cek tiap role).
 
+### Fase 13.1 — Polish pass kualitas produk (dalam GUIDELINE)
+
+Peningkatan UX/craft menyeluruh memakai skill `impeccable` + `emil-design-eng` + `redesign-existing-projects`. Arah dikonfirmasi user: **poles dalam GUIDELINE** (identitas utuh), kerjakan sekaligus. UI-only, tanpa sentuh backend/logic/DB. Detail di GUIDELINE.md §14.1.
+
+- [x] Motion: token easing `--ease-out-quart`/`--ease-out-expo`; `x-button` `:active` press + hover-lift + `focus-visible`; input/select transisi + `focus-visible`; kartu-link dosen `hover:-translate-y-0.5`.
+- [x] Feedback: komponen `<x-alert>` (4 tipe, ikon, dismiss); render `session('success')`+`session('error')` di app-shell & student-layout; loading spinner submit form via `app.js` (progressive enhancement, hormati confirm()/form GET).
+- [x] Empty state: `<x-empty-state>` + ikon + judul + slot CTA.
+- [x] Aksesibilitas: `--color-muted` #6B7688→#64707F (WCAG AA di atas canvas); `focus-visible` konsisten di nav sidebar, dropdown-link, kartu-link.
+- [x] Konsistensi: satukan ke `<x-button>`, hapus `x-primary/secondary/danger-button`; 6 halaman auth pakai `<x-button>` + copy Indonesia.
+- [x] Tabel: header sticky (`max-h-[70vh] overflow-auto`).
+- [x] Dark-mode ready: dikonfirmasi seluruh komponen token-based (tinggal override token nanti).
+- [x] Verifikasi: `php artisan test --compact` hijau, `vendor/bin/pint` bersih, `npm run build` sukses.
+
 ---
 
 ## Catatan Perluasan dari PRD Asli

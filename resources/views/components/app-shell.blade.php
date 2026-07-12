@@ -45,7 +45,7 @@
                         @php $active = request()->routeIs($item['pattern'] ?? $item['route']); @endphp
                         <a href="{{ isset($item['route']) ? route($item['route']) : '#' }}"
                             @class([
-                                'flex items-center gap-3 rounded-input px-3 py-2.5 text-sm transition duration-150',
+                                'flex items-center gap-3 rounded-input px-3 py-2.5 text-sm transition duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
                                 'bg-accent font-medium text-white' => $active,
                                 'text-ink hover:bg-accent-soft' => ! $active,
                             ])>
@@ -99,9 +99,10 @@
 
             <main class="p-4 lg:px-8 lg:py-6">
                 @if (session('success'))
-                    <div class="mb-4 rounded-card bg-success/10 px-4 py-3 text-sm text-success shadow-sm">
-                        {{ session('success') }}
-                    </div>
+                    <x-alert type="success" class="mb-4">{{ session('success') }}</x-alert>
+                @endif
+                @if (session('error'))
+                    <x-alert type="error" class="mb-4">{{ session('error') }}</x-alert>
                 @endif
 
                 {{ $slot }}

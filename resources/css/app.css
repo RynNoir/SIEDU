@@ -19,7 +19,7 @@
     --color-success: #3F8F5F;
     --color-warning: #C97A2B;
     --color-danger: #C1503F;
-    --color-muted: #6B7688;
+    --color-muted: #64707F; /* dinaikkan dari #6B7688 agar teks kecil lolos WCAG AA di atas canvas (§9) */
 
     /* Radius (v2 — gaya Elegent: radius besar + shadow, bukan border-first) */
     --radius-card: 20px;
@@ -38,9 +38,28 @@
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'IBM Plex Sans', sans-serif;
     --font-mono: 'IBM Plex Mono', monospace;
+
+    /* Easing (motion §8): kurva ease-out eksponensial — feedback instan, tanpa bounce */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [x-cloak] { display: none !important; }
+
+/* Spinner tombol saat submit (app.js). Warna mengikuti currentColor tombol. */
+.js-spinner {
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: siedu-spin 0.6s linear infinite;
+}
+
+@keyframes siedu-spin {
+    to { transform: rotate(360deg); }
+}
 
 @media (prefers-reduced-motion: reduce) {
     *,

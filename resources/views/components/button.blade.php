@@ -1,10 +1,10 @@
 @props(['variant' => 'primary', 'href' => null, 'type' => 'submit'])
 
 @php
-    $base = 'inline-flex items-center justify-center gap-2 rounded-input px-5 py-2.5 text-sm font-medium transition duration-150 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2';
+    $base = 'inline-flex items-center justify-center gap-2 rounded-input px-5 py-2.5 text-sm font-medium transition duration-150 ease-out-quart active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:active:scale-100';
     $variants = [
-        'primary' => 'bg-accent text-white hover:brightness-95',
-        'secondary' => 'border border-border text-ink hover:bg-accent-soft',
+        'primary' => 'bg-accent text-white hover:brightness-110 hover:shadow-md',
+        'secondary' => 'border border-border text-ink hover:bg-accent-soft hover:border-accent/40',
         'destructive' => 'border border-danger text-danger hover:bg-danger/10',
         'disabled' => 'bg-border text-muted cursor-not-allowed',
     ];

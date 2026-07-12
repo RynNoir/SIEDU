@@ -26,7 +26,7 @@
         <div class="grid gap-3 sm:grid-cols-2">
             @foreach ($assignments as $assignment)
                 <a href="{{ route('lecturer.assignments.show', $assignment) }}"
-                    class="block rounded-card bg-surface p-4 shadow-md transition hover:shadow-lg">
+                    class="block rounded-card bg-surface p-4 shadow-md transition duration-150 ease-out-quart hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
                     <p class="font-medium text-ink">{{ $assignment->course->name }}</p>
                     <p class="mt-0.5 text-sm text-muted">
                         <span class="font-mono">{{ $assignment->course->code }}</span> · Kelas
