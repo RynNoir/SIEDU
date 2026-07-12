@@ -1,11 +1,11 @@
 <x-admin-layout header="Mata Kuliah">
-    <div class="mb-4 flex items-center justify-between">
-        <p class="text-sm text-muted">{{ $courses->total() }} mata kuliah</p>
-        <x-button :href="route('admin.courses.create')">Tambah Mata Kuliah</x-button>
-    </div>
-
-    {{-- Filter live: dropdown auto-submit, cari didebounce (GUIDELINE §6.6) --}}
-    <form method="GET" class="mb-4">
+    {{--
+        Filter live: hx-target/hx-select "#results" override target #app-content bawaan
+        shell (lihat app-shell.blade.php) -- jadi cuma tabel+pagination yang ditukar,
+        bukan seluruh halaman (judul, form filter, dst tetap diam).
+    --}}
+    <form method="GET" class="mb-4"
+        hx-target="#results" hx-select="#results" hx-swap="innerHTML swap:100ms settle:150ms">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <x-text-input name="search" placeholder="Cari kode / nama mata kuliah"
                 :value="request('search')" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
@@ -30,41 +30,50 @@
         </div>
     </form>
 
-    @if ($courses->isEmpty())
-        <x-empty-state message="Tidak ada mata kuliah yang cocok. Coba ubah filter atau tambahkan mata kuliah baru." />
-    @else
-        <x-table>
-            <x-slot name="head">
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kode</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Nama</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Prodi</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Sem</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">SKS</th>
-                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted">Aksi</th>
-            </x-slot>
+    <div id="results" class="relative">
+        <div class="htmx-indicator absolute inset-x-0 top-0 z-10 h-0.5 bg-accent"></div>
 
-            @foreach ($courses as $course)
-                <tr class="hover:bg-accent-soft">
-                    <td class="px-4 py-3 font-mono text-ink">{{ $course->code }}</td>
-                    <td class="px-4 py-3 text-ink">{{ $course->name }}</td>
-                    <td class="px-4 py-3 font-mono text-muted">{{ $course->studyProgram->code }}</td>
-                    <td class="px-4 py-3 text-muted">{{ $course->semester }}</td>
-                    <td class="px-4 py-3 text-muted">{{ $course->credit_hours }}</td>
-                    <td class="px-4 py-3">
-                        <div class="flex items-center justify-end gap-2">
-                            <x-button variant="secondary" :href="route('admin.courses.edit', $course)">Edit</x-button>
-                            <form method="POST" action="{{ route('admin.courses.destroy', $course) }}"
-                                onsubmit="return confirm('Hapus mata kuliah {{ $course->code }}?')">
-                                @csrf
-                                @method('DELETE')
-                                <x-button variant="destructive">Hapus</x-button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
-        </x-table>
+        <div class="mb-4 flex items-center justify-between">
+            <p class="text-sm text-muted">{{ $courses->total() }} mata kuliah</p>
+            <x-button :href="route('admin.courses.create')">Tambah Mata Kuliah</x-button>
+        </div>
 
-        <div class="mt-4">{{ $courses->links() }}</div>
-    @endif
+        @if ($courses->isEmpty())
+            <x-empty-state message="Tidak ada mata kuliah yang cocok. Coba ubah filter atau tambahkan mata kuliah baru." />
+        @else
+            <x-table>
+                <x-slot name="head">
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kode</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Nama</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Prodi</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Sem</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">SKS</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted">Aksi</th>
+                </x-slot>
+
+                @foreach ($courses as $course)
+                    <tr class="hover:bg-accent-soft">
+                        <td class="px-4 py-3 font-mono text-ink">{{ $course->code }}</td>
+                        <td class="px-4 py-3 text-ink">{{ $course->name }}</td>
+                        <td class="px-4 py-3 font-mono text-muted">{{ $course->studyProgram->code }}</td>
+                        <td class="px-4 py-3 text-muted">{{ $course->semester }}</td>
+                        <td class="px-4 py-3 text-muted">{{ $course->credit_hours }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-end gap-2">
+                                <x-button variant="secondary" :href="route('admin.courses.edit', $course)">Edit</x-button>
+                                <form method="POST" action="{{ route('admin.courses.destroy', $course) }}"
+                                    onsubmit="return confirm('Hapus mata kuliah {{ $course->code }}?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <x-button variant="destructive">Hapus</x-button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </x-table>
+
+            <div class="mt-4" hx-target="#results" hx-select="#results" hx-swap="innerHTML swap:100ms settle:150ms">{{ $courses->links() }}</div>
+        @endif
+    </div>
 </x-admin-layout>

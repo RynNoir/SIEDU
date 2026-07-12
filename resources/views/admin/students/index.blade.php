@@ -1,11 +1,7 @@
 <x-admin-layout header="Mahasiswa">
-    <div class="mb-4 flex items-center justify-between">
-        <p class="text-sm text-muted">{{ $students->total() }} mahasiswa</p>
-        <x-button :href="route('admin.students.create')">Tambah Mahasiswa</x-button>
-    </div>
-
-    {{-- Filter live: dropdown auto-submit, cari didebounce (GUIDELINE §6.6) --}}
-    <form method="GET" class="mb-4">
+    {{-- Filter live: target #results (bukan #app-content bawaan shell) -- cuma tabel yang ditukar --}}
+    <form method="GET" class="mb-4"
+        hx-target="#results" hx-select="#results" hx-swap="innerHTML swap:100ms settle:150ms">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <x-text-input name="search" placeholder="Cari NIM / nama"
                 :value="request('search')" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
@@ -36,40 +32,49 @@
         </div>
     </form>
 
-    @if ($students->isEmpty())
-        <x-empty-state message="Tidak ada mahasiswa yang cocok. Coba ubah filter atau tambahkan mahasiswa baru." />
-    @else
-        <x-table>
-            <x-slot name="head">
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">NIM</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Nama</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kelas</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Sem</th>
-                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Status</th>
-                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted">Aksi</th>
-            </x-slot>
+    <div id="results" class="relative">
+        <div class="htmx-indicator absolute inset-x-0 top-0 z-10 h-0.5 bg-accent"></div>
 
-            @foreach ($students as $student)
-                <tr class="hover:bg-accent-soft">
-                    <td class="px-4 py-3 font-mono text-ink">{{ $student->nim }}</td>
-                    <td class="px-4 py-3 text-ink">{{ $student->name }}</td>
-                    <td class="px-4 py-3 font-mono text-muted">{{ $student->classGroup->class_code }}</td>
-                    <td class="px-4 py-3 text-muted">{{ $student->current_semester }}</td>
-                    <td class="px-4 py-3"><x-badge-status :status="$student->status" /></td>
-                    <td class="px-4 py-3">
-                        <div class="flex items-center justify-end gap-2">
-                            <x-button variant="secondary" :href="route('admin.students.edit', $student)">Edit</x-button>
-                            <form method="POST" action="{{ route('admin.students.destroy', $student) }}"
-                                onsubmit="return confirm('Hapus mahasiswa {{ $student->nim }} beserta akunnya?')">
-                                @csrf @method('DELETE')
-                                <x-button variant="destructive">Hapus</x-button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
-        </x-table>
+        <div class="mb-4 flex items-center justify-between">
+            <p class="text-sm text-muted">{{ $students->total() }} mahasiswa</p>
+            <x-button :href="route('admin.students.create')">Tambah Mahasiswa</x-button>
+        </div>
 
-        <div class="mt-4">{{ $students->links() }}</div>
-    @endif
+        @if ($students->isEmpty())
+            <x-empty-state message="Tidak ada mahasiswa yang cocok. Coba ubah filter atau tambahkan mahasiswa baru." />
+        @else
+            <x-table>
+                <x-slot name="head">
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">NIM</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Nama</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kelas</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Sem</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Status</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted">Aksi</th>
+                </x-slot>
+
+                @foreach ($students as $student)
+                    <tr class="hover:bg-accent-soft">
+                        <td class="px-4 py-3 font-mono text-ink">{{ $student->nim }}</td>
+                        <td class="px-4 py-3 text-ink">{{ $student->name }}</td>
+                        <td class="px-4 py-3 font-mono text-muted">{{ $student->classGroup->class_code }}</td>
+                        <td class="px-4 py-3 text-muted">{{ $student->current_semester }}</td>
+                        <td class="px-4 py-3"><x-badge-status :status="$student->status" /></td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-end gap-2">
+                                <x-button variant="secondary" :href="route('admin.students.edit', $student)">Edit</x-button>
+                                <form method="POST" action="{{ route('admin.students.destroy', $student) }}"
+                                    onsubmit="return confirm('Hapus mahasiswa {{ $student->nim }} beserta akunnya?')">
+                                    @csrf @method('DELETE')
+                                    <x-button variant="destructive">Hapus</x-button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </x-table>
+
+            <div class="mt-4" hx-target="#results" hx-select="#results" hx-swap="innerHTML swap:100ms settle:150ms">{{ $students->links() }}</div>
+        @endif
+    </div>
 </x-admin-layout>

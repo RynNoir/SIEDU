@@ -284,6 +284,8 @@ Keluhan user: filter/pencarian dan pindah menu sidebar terasa kaku karena reload
 - [x] Verifikasi: `php artisan test --compact` hijau (103 test — murni perubahan frontend, tanpa sentuh route/controller kecuali cara submit form di sisi klien), `vendor/bin/pint` bersih, `npm run build` sukses.
 - [ ] **Catatan**: perilaku AJAX/transisi tak bisa diverifikasi otomatis oleh Pest (server-side only) — perlu dicek manual via `npm run dev` di browser.
 
+**Bugfix (dilaporkan user setelah pakai)**: (1) sidebar tak sinkron setelah pindah menu — status aktif nav basi karena nav di luar `#app-content`; diperbaiki dengan `hx-swap-oob="true"` pada `<nav id="sidebar-nav">` (diverifikasi lewat source `htmx.js`: OOB diproses di seluruh respons sebelum `hx-select` mempersempit). (2) filter di 4 halaman admin masih menukar seluruh konten, bukan cuma tabel — filter form & wrapper pagination diberi `hx-target`/`hx-select="#results"` sendiri (override lokal menang atas default shell lewat closest-ancestor lookup), tabel+pagination dibungkus `<div id="results">`; link Edit/Hapus per baris sengaja tetap pakai default `#app-content` (menuju halaman berbeda). Detail lengkap di GUIDELINE.md §14.2. 103 test tetap hijau, pint bersih, build sukses.
+
 ---
 
 ## Catatan Perluasan dari PRD Asli
