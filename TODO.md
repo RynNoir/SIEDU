@@ -252,6 +252,7 @@ Keputusan yang dikonfirmasi user sebelum implementasi: **(1)** chart tanpa libra
 - [x] Halaman auth: dari split full-height jadi kartu mengambang terpusat (`max-w-4xl`, `shadow-xl`) ala proporsi kartu login Elegent.
 - [x] Dibersihkan: `components/nav-link.blade.php` & `components/responsive-nav-link.blade.php` (dead code sisa `layouts/navigation.blade.php` yang sudah dihapus sebelumnya).
 - [x] Verifikasi: `php artisan test --compact` hijau (99 test — tanpa regresi, murni perubahan visual), `vendor/bin/pint` bersih, `npm run build` sukses.
+- [x] **Revisi halaman login (referensi kedua)**: split edge-to-edge (form 440px kiri + `<x-auth-illustration>` kanan penuh tinggi layar), gantikan kartu mengambang terpusat sebelumnya. Ilustrasi geometris token GUIDELINE + motif diamond Rating Gauge diperbesar. Toggle show/hide password (Alpine). **Ditolak**: tombol OAuth Google & link "Register here" — tidak ada padanan fitur di SIEDU (dikonfirmasi user).
 - [ ] **Keputusan akhir**: merge ke `master` atau tetap jadi alternatif untuk dibandingkan — menunggu review visual dari user (`npm run dev`, cek tiap role).
 
 ---
