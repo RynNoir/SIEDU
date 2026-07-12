@@ -38,19 +38,19 @@
                     <div>
                         <x-input-label for="impression_text" :value="'Apa yang paling Anda sukai dari cara mengajar dosen ini?'" />
                         <textarea id="impression_text" name="impression_text" rows="3"
-                            class="mt-1 w-full rounded-input border-border bg-surface text-ink text-sm shadow-sm focus:border-accent focus:ring-accent">{{ old('impression_text') }}</textarea>
+                            class="mt-1 w-full rounded-input border-border bg-surface text-ink text-sm shadow-sm transition duration-150 ease-out-quart focus:border-accent focus:ring-accent">{{ old('impression_text') }}</textarea>
                     </div>
                     <div>
                         <x-input-label for="suggestion_text" :value="'Apa yang menurut Anda perlu diperbaiki?'" />
                         <textarea id="suggestion_text" name="suggestion_text" rows="3"
-                            class="mt-1 w-full rounded-input border-border bg-surface text-ink text-sm shadow-sm focus:border-accent focus:ring-accent">{{ old('suggestion_text') }}</textarea>
+                            class="mt-1 w-full rounded-input border-border bg-surface text-ink text-sm shadow-sm transition duration-150 ease-out-quart focus:border-accent focus:ring-accent">{{ old('suggestion_text') }}</textarea>
                     </div>
                 </div>
             </x-card>
         </div>
 
         <div class="mt-6 flex justify-end">
-            <x-button type="submit">Kirim Evaluasi</x-button>
+            <x-button type="submit" class="w-full sm:w-auto">Kirim Evaluasi</x-button>
         </div>
     </form>
 </x-student-layout>

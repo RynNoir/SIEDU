@@ -53,7 +53,7 @@
         </div>
     </header>
 
-    <main id="app-content" class="relative mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 lg:pb-8">
+    <main id="app-content" class="relative mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-6 lg:pb-8">
         <div class="htmx-indicator absolute inset-x-0 top-0 z-20 h-0.5 bg-accent"></div>
 
         @if ($header)
@@ -70,8 +70,14 @@
         {{ $slot }}
     </main>
 
-    {{-- Bottom-nav mobile (§10) --}}
-    <nav class="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface sm:hidden">
+    {{--
+        Bottom-nav mobile (§10). hx-swap-oob: nav ini di luar #app-content (sengaja, biar
+        tak ikut flicker), tapi status aktifnya dihitung ulang tiap request (request()->routeIs())
+        -- tanpa OOB, status aktif jadi basi setelah navigasi boosted karena nav tak pernah
+        ikut ditukar (bug yang sama seperti sidebar admin, lihat GUIDELINE §14.2).
+    --}}
+    <nav id="bottom-nav" hx-swap-oob="true"
+        class="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
         <a href="{{ route('student.evaluations.index') }}"
             @class([
                 'flex flex-1 flex-col items-center gap-1 py-2 text-xs',
