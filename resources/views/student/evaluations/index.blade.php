@@ -12,7 +12,7 @@
             <div class="space-y-3">
                 @foreach ($assignments as $assignment)
                     @php $done = in_array($assignment->id, $doneIds, true); @endphp
-                    <div class="flex items-center justify-between gap-4 rounded-card border border-border bg-surface p-4">
+                    <div class="flex items-center justify-between gap-4 rounded-card bg-surface p-4 shadow-md">
                         <div class="min-w-0">
                             {{-- Team teaching: label jelas "MK — Dosen" (PRD §6.3.4) --}}
                             <p class="truncate font-medium text-ink">{{ $assignment->course->name }}</p>

@@ -236,6 +236,26 @@ Ditemukan saat review: `CourseClassAssignmentRequest` (Fase 5) memvalidasi semes
 
 ---
 
+## Fase 13 — [Eksperimen, branch `ui/elegent-style`] Bahasa Visual Shadow-First ala Elegent
+
+**Hanya ada di branch `ui/elegent-style`, bukan `master`.** Tujuan: menyamakan struktur UI SIEDU semirip mungkin dengan referensi eksternal Elegent (sidebar mengambang, card shadow tebal, radius besar, chart ringkas), sambil mempertahankan 100% palet warna & tipografi GUIDELINE §2–§3, tanpa mengubah skema database/business logic. Lihat GUIDELINE.md §14 untuk rincian prinsip. UI-only — tidak ada perubahan route/controller di luar 1 controller (lihat di bawah) dan 2 file dihapus karena sudah dead code dari sesi sebelumnya.
+
+Keputusan yang dikonfirmasi user sebelum implementasi: **(1)** chart tanpa library baru (SVG statis, opsi A dipertahankan); **(2)** tanpa elemen dekoratif tak berfungsi (search/bell/language switcher); **(3)** tanpa data tren fiktif pada stat card.
+
+- [x] Token desain: `--radius-card` 8px→20px, `--radius-input` 6px→12px di `app.css` — cascading otomatis ke semua komponen.
+- [x] `x-app-shell`: sidebar jadi mengambang (margin dari tepi, `shadow-lg`, bukan border-r), item nav aktif jadi latar solid `accent`; topbar dilepas dari border-bottom.
+- [x] `x-card`, `x-stat-card`, `x-table`, `x-dropdown`, pagination: border-first → shadow-first (`shadow-md`/`shadow-lg`, tanpa `border-border`). `x-stat-card` re-anatomi: ikon besar kiri + konten kanan (ala `SaleInfo` Elegent), tanpa baris tren.
+- [x] Komponen baru `<x-line-chart>` & `<x-donut-chart>`: SVG statis tanpa dependency, warna dari token semantik yang sudah ada.
+- [x] `Admin\DashboardController`: tambah 2 query agregasi read-only (evaluasi masuk per hari 14 hari terakhir; distribusi mahasiswa per status) untuk mengisi chart — agregat, tidak menyentuh identitas mahasiswa individual.
+- [x] Dashboard admin: pasang line chart + donut chart baru.
+- [x] Card-card halaman lain yang masih border-first (`lecturer/dashboard`, `partials/assignment-result`, `student/evaluations/index`) diikutkan ke shadow-first agar konsisten se-aplikasi.
+- [x] Halaman auth: dari split full-height jadi kartu mengambang terpusat (`max-w-4xl`, `shadow-xl`) ala proporsi kartu login Elegent.
+- [x] Dibersihkan: `components/nav-link.blade.php` & `components/responsive-nav-link.blade.php` (dead code sisa `layouts/navigation.blade.php` yang sudah dihapus sebelumnya).
+- [x] Verifikasi: `php artisan test --compact` hijau (99 test — tanpa regresi, murni perubahan visual), `vendor/bin/pint` bersih, `npm run build` sukses.
+- [ ] **Keputusan akhir**: merge ke `master` atau tetap jadi alternatif untuk dibandingkan — menunggu review visual dari user (`npm run dev`, cek tiap role).
+
+---
+
 ## Catatan Perluasan dari PRD Asli
 
 Dua keputusan project ini **menambah/mengubah** skema 12-tabel asli PRD — dicatat di sini agar tidak terlewat:

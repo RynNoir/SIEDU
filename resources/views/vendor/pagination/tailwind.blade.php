@@ -3,21 +3,21 @@
         {{-- Mobile: Prev / Next --}}
         <div class="flex flex-1 justify-between sm:hidden">
             @if ($paginator->onFirstPage())
-                <span class="relative inline-flex cursor-default items-center rounded-input border border-border bg-surface px-4 py-2 text-sm text-muted">
+                <span class="relative inline-flex cursor-default items-center rounded-full bg-surface px-4 py-2 text-sm text-muted shadow-sm">
                     Sebelumnya
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center rounded-input border border-border bg-surface px-4 py-2 text-sm text-ink hover:bg-accent-soft">
+                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center rounded-full bg-surface px-4 py-2 text-sm text-ink shadow-sm hover:bg-accent-soft">
                     Sebelumnya
                 </a>
             @endif
 
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="relative ml-3 inline-flex items-center rounded-input border border-border bg-surface px-4 py-2 text-sm text-ink hover:bg-accent-soft">
+                <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="relative ml-3 inline-flex items-center rounded-full bg-surface px-4 py-2 text-sm text-ink shadow-sm hover:bg-accent-soft">
                     Berikutnya
                 </a>
             @else
-                <span class="relative ml-3 inline-flex cursor-default items-center rounded-input border border-border bg-surface px-4 py-2 text-sm text-muted">
+                <span class="relative ml-3 inline-flex cursor-default items-center rounded-full bg-surface px-4 py-2 text-sm text-muted shadow-sm">
                     Berikutnya
                 </span>
             @endif
@@ -38,22 +38,22 @@
             </div>
 
             <div>
-                <span class="relative z-0 inline-flex gap-1">
+                <span class="relative z-0 inline-flex gap-1.5">
                     {{-- Previous --}}
                     @if ($paginator->onFirstPage())
                         <span aria-disabled="true" aria-label="{{ __('pagination.previous') }}">
-                            <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-input border border-border bg-surface text-sm text-border" aria-hidden="true">&lsaquo;</span>
+                            <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-full bg-surface text-sm text-border shadow-sm" aria-hidden="true">&lsaquo;</span>
                         </span>
                     @else
                         <a href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="{{ __('pagination.previous') }}"
-                            class="relative inline-flex size-9 items-center justify-center rounded-input border border-border bg-surface text-sm text-ink hover:bg-accent-soft">&lsaquo;</a>
+                            class="relative inline-flex size-9 items-center justify-center rounded-full bg-surface text-sm text-ink shadow-sm hover:bg-accent-soft">&lsaquo;</a>
                     @endif
 
                     {{-- Nomor halaman --}}
                     @foreach ($elements as $element)
                         @if (is_string($element))
                             <span aria-disabled="true">
-                                <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-input border border-border bg-surface text-sm text-muted">{{ $element }}</span>
+                                <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-full bg-surface text-sm text-muted shadow-sm">{{ $element }}</span>
                             </span>
                         @endif
 
@@ -61,11 +61,11 @@
                             @foreach ($element as $page => $url)
                                 @if ($page == $paginator->currentPage())
                                     <span aria-current="page">
-                                        <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-input border border-accent bg-accent text-sm font-medium text-white">{{ $page }}</span>
+                                        <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-full bg-accent text-sm font-medium text-white shadow-sm">{{ $page }}</span>
                                     </span>
                                 @else
                                     <a href="{{ $url }}" aria-label="{{ __('Ke halaman :page', ['page' => $page]) }}"
-                                        class="relative inline-flex size-9 items-center justify-center rounded-input border border-border bg-surface text-sm text-ink hover:bg-accent-soft">{{ $page }}</a>
+                                        class="relative inline-flex size-9 items-center justify-center rounded-full bg-surface text-sm text-ink shadow-sm hover:bg-accent-soft">{{ $page }}</a>
                                 @endif
                             @endforeach
                         @endif
@@ -74,10 +74,10 @@
                     {{-- Next --}}
                     @if ($paginator->hasMorePages())
                         <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="{{ __('pagination.next') }}"
-                            class="relative inline-flex size-9 items-center justify-center rounded-input border border-border bg-surface text-sm text-ink hover:bg-accent-soft">&rsaquo;</a>
+                            class="relative inline-flex size-9 items-center justify-center rounded-full bg-surface text-sm text-ink shadow-sm hover:bg-accent-soft">&rsaquo;</a>
                     @else
                         <span aria-disabled="true" aria-label="{{ __('pagination.next') }}">
-                            <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-input border border-border bg-surface text-sm text-border" aria-hidden="true">&rsaquo;</span>
+                            <span class="relative inline-flex size-9 cursor-default items-center justify-center rounded-full bg-surface text-sm text-border shadow-sm" aria-hidden="true">&rsaquo;</span>
                         </span>
                     @endif
                 </span>

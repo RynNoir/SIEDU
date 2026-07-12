@@ -1,5 +1,5 @@
-{{-- Header bg-canvas, border 1px, tanpa zebra-stripe. Slot 'head' untuk <th>, slot default untuk <tr> body. --}}
-<div class="overflow-x-auto rounded-card border border-border bg-surface">
+{{-- Header bg-canvas, tanpa zebra-stripe, shadow+radius besar (bukan border) ala Elegent. --}}
+<div class="overflow-x-auto rounded-card bg-surface shadow-md">
     <table class="min-w-full border-collapse text-sm">
         <thead class="bg-canvas">
             <tr class="text-left">

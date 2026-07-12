@@ -66,7 +66,7 @@
     @else
         <div class="space-y-3">
             @foreach ($impressions as $imp)
-                <div class="rounded-card border border-border p-4">
+                <div class="rounded-card bg-surface p-4 shadow-md">
                     <div class="mb-2 flex items-center justify-between gap-2">
                         <x-rating-display :score="$imp->avg_rating" />
                         <span class="rounded-full bg-muted/15 px-2 py-0.5 text-xs text-muted">Anonim</span>

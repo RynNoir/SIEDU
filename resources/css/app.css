@@ -21,9 +21,9 @@
     --color-danger: #C1503F;
     --color-muted: #6B7688;
 
-    /* Radius */
-    --radius-card: 8px;
-    --radius-input: 6px;
+    /* Radius (v2 — gaya Elegent: radius besar + shadow, bukan border-first) */
+    --radius-card: 20px;
+    --radius-input: 12px;
 
     /* Spacing */
     --spacing-1: 4px;

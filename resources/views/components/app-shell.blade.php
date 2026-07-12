@@ -27,10 +27,12 @@
         {{-- Overlay mobile --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 z-20 bg-ink/40 lg:hidden"></div>
 
-        {{-- Sidebar mengambang (GUIDELINE §13.1) --}}
+        {{-- Sidebar mengambang: shadow + radius besar, bukan border (gaya Elegent) --}}
         <aside x-cloak :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            class="fixed inset-y-0 left-0 z-30 flex w-64 transform flex-col border-r border-border bg-surface transition-transform lg:static lg:translate-x-0">
-            <div class="flex h-16 items-center gap-2 border-b border-border px-6">
+            class="fixed inset-y-0 left-0 z-30 flex w-64 transform flex-col bg-surface transition-transform
+                   lg:sticky lg:top-6 lg:my-6 lg:ml-6 lg:h-[calc(100vh-3rem)] lg:w-60 lg:translate-x-0
+                   lg:rounded-card lg:shadow-lg">
+            <div class="flex h-16 items-center gap-2 px-6">
                 <a href="{{ $homeRoute }}" class="font-display text-lg font-semibold text-ink">SIEDU</a>
                 @if ($roleLabel)
                     <span class="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">{{ $roleLabel }}</span>
@@ -43,12 +45,12 @@
                         @php $active = request()->routeIs($item['pattern'] ?? $item['route']); @endphp
                         <a href="{{ isset($item['route']) ? route($item['route']) : '#' }}"
                             @class([
-                                'flex items-center gap-3 rounded-input px-3 py-2 text-sm transition duration-150',
-                                'bg-accent-soft font-medium text-accent' => $active,
-                                'text-ink hover:bg-canvas' => ! $active,
+                                'flex items-center gap-3 rounded-input px-3 py-2.5 text-sm transition duration-150',
+                                'bg-accent font-medium text-white' => $active,
+                                'text-ink hover:bg-accent-soft' => ! $active,
                             ])>
                             <x-icon :name="$item['icon'] ?? 'dashboard'"
-                                @class(['size-5 shrink-0', 'text-accent' => $active, 'text-muted' => ! $active]) />
+                                @class(['size-5 shrink-0', 'text-white' => $active, 'text-muted' => ! $active]) />
                             <span class="truncate">{{ $item['label'] }}</span>
                         </a>
                     @endif
@@ -58,12 +60,12 @@
 
         {{-- Konten --}}
         <div class="flex min-w-0 flex-1 flex-col">
-            <header class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-6">
+            <header class="flex h-16 items-center justify-between bg-canvas px-4 lg:px-8 lg:pt-6">
                 <div class="flex items-center gap-3">
                     <button @click="sidebarOpen = !sidebarOpen" class="text-muted hover:text-ink lg:hidden" aria-label="Buka menu">
                         <x-icon name="menu" class="size-6" />
                     </button>
-                    <div class="font-display text-base font-semibold">{{ $header ?? '' }}</div>
+                    <div class="font-display text-xl font-semibold">{{ $header ?? '' }}</div>
                 </div>
 
                 {{-- Avatar dropdown akun (GUIDELINE §13.2) --}}
@@ -95,9 +97,9 @@
                 </x-dropdown>
             </header>
 
-            <main class="p-4 lg:p-6">
+            <main class="p-4 lg:px-8 lg:py-6">
                 @if (session('success'))
-                    <div class="mb-4 rounded-card border border-success/30 bg-success/10 px-4 py-3 text-sm text-success">
+                    <div class="mb-4 rounded-card bg-success/10 px-4 py-3 text-sm text-success shadow-sm">
                         {{ session('success') }}
                     </div>
                 @endif

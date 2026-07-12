@@ -371,7 +371,26 @@ Realisasi kartu ringkasan yang sudah tergambar di wireframe §4.3, distandarkan 
 
 - **Border 1px adalah struktur utama** (§4.1). Shadow hanya sangat tipis (`shadow-sm`) untuk elemen yang benar-benar "mengambang" (dropdown, modal, sidebar mobile). Jangan meniru shadow tebal referensi eksternal.
 
+  > **Disuperseded di branch `ui/elegent-style` oleh §14** — eksplorasi visual yang mengganti prinsip ini dengan shadow+radius-besar sebagai struktur utama (bukan border). Lihat §14 untuk detail; bagian ini (§13.6) tetap berlaku di `master`.
+
 ### 13.7 Halaman Auth (split layout)
 
 - Halaman login/lupa-password: dua kolom pada desktop — **panel identitas** (kiri, latar `color-ink` atau `accent-soft`, wordmark SIEDU + tagline singkat) dan **form** (kanan, `surface`). Pada mobile menumpuk jadi satu kolom, panel identitas ringkas di atas.
 - Tetap patuh §6.2 (form) dan §12 (copy).
+
+---
+
+## 14. [Eksperimen — branch `ui/elegent-style`] Bahasa Visual Shadow-First
+
+Branch terpisah yang mengganti struktur UI menjadi **semirip mungkin dengan referensi eksternal Elegent** (sidebar mengambang besar, card shadow tebal, radius besar, chart ringkas) **sambil mempertahankan 100% palet warna & tipografi GUIDELINE §2–§3** dan tanpa mengubah business logic/skema database. Ini alternatif visual untuk dibandingkan dengan `master` — bukan pengganti otomatis §13.
+
+**Prinsip yang diubah dari §4.1/§13.6 (khusus branch ini):**
+- **Radius besar jadi standar**: `--radius-card` naik dari 8px → **20px**, `--radius-input` dari 6px → **12px** (token sama, nilai berubah — otomatis berlaku ke semua komponen yang memakai `rounded-card`/`rounded-input`).
+- **Shadow menggantikan border sebagai struktur utama** kartu, tabel, sidebar, tombol pagination. `border-border` pada card/table/sidebar dihapus, diganti `shadow-md`/`shadow-lg`. Border tetap dipertahankan pada elemen yang secara fungsional butuh (input/textarea, empty-state dashed).
+- **Sidebar mengambang** dengan margin dari tepi (bukan flush border-r), shadow-lg, item aktif jadi latar solid `accent` (bukan `accent-soft`) — meniru highlight solid Elegent.
+- **Kartu statistik (`x-stat-card`)** diubah anatominya: ikon besar (56px) di kiri dalam kotak `accent-soft`, konten (label+angka) di kanan — meniru `SaleInfo` Elegent. **Tanpa angka tren "+X% bulan lalu"** — data historis pembanding tidak ada di sistem, menampilkannya akan berarti data palsu.
+- **Chart ringkas tanpa library** (`<x-line-chart>`, `<x-donut-chart>`): SVG statis (polyline/area untuk tren, stroke-dasharray untuk donut), warna dari token GUIDELINE yang sudah punya makna semantik (mis. status mahasiswa: aktif=`success`, cuti=`warning`, DO=`danger`). Tanpa animasi/tooltip/legend-toggle interaktif (butuh library chart sungguhan untuk itu — di luar keputusan "tanpa dependency baru").
+- **Elemen dekoratif tanpa fungsi nyata (search box, notification bell, language switcher) sengaja TIDAK ditambahkan** — tetap konsisten dengan prinsip §13.2 "shell jujur pada fungsi yang benar-benar ada", meski Elegent punya elemen-elemen ini.
+- **Halaman auth**: dari split full-height jadi **kartu mengambang terpusat** (`max-w-4xl`, `shadow-xl`, dua kolom di dalamnya) — meniru proporsi kartu login Elegent (960×560) alih-alih split penuh layar.
+
+**Yang TIDAK berubah** (identik dengan `master`/§1–§12): seluruh token warna §2, tipografi §3, elemen signature Rating Gauge §5, aturan aksesibilitas §9, motion §8, business logic, skema database, dan struktur fitur PRD.
