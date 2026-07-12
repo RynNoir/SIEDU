@@ -23,7 +23,14 @@
 </head>
 
 <body class="font-body bg-canvas text-ink antialiased">
-    <div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex">
+    {{--
+        hx-boost: semua <a>/<form> di dalam sini otomatis jadi fetch AJAX (htmx),
+        hanya #app-content yang ditukar -- sidebar & topbar tetap diam saat pindah menu
+        atau submit filter (GUIDELINE §8 motion, tanpa reload penuh).
+    --}}
+    <div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex"
+        hx-boost="true" hx-target="#app-content" hx-select="#app-content"
+        hx-swap="innerHTML swap:150ms settle:200ms transition:true">
         {{-- Overlay mobile --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 z-20 bg-ink/40 lg:hidden"></div>
 
@@ -58,8 +65,10 @@
             </nav>
         </aside>
 
-        {{-- Konten --}}
-        <div class="flex min-w-0 flex-1 flex-col">
+        {{-- Konten yang ditukar htmx saat navigasi/filter (sidebar & topbar di luar area ini tetap diam) --}}
+        <div id="app-content" class="relative flex min-w-0 flex-1 flex-col">
+            <div class="htmx-indicator absolute inset-x-0 top-0 z-20 h-0.5 bg-accent"></div>
+
             <header class="flex h-16 items-center justify-between bg-canvas px-4 lg:px-8 lg:pt-6">
                 <div class="flex items-center gap-3">
                     <button @click="sidebarOpen = !sidebarOpen" class="text-muted hover:text-ink lg:hidden" aria-label="Buka menu">
@@ -86,7 +95,8 @@
                                 <span class="flex items-center gap-2"><x-icon name="profile" class="size-4 text-muted" /> Profil</span>
                             </x-dropdown-link>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}">
+                        {{-- hx-boost="false": logout selalu navigasi penuh, bukan swap parsial (halaman login beda struktur). --}}
+                        <form method="POST" action="{{ route('logout') }}" hx-boost="false">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault(); this.closest('form').submit();">

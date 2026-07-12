@@ -49,7 +49,7 @@
                 @foreach (request()->except('rating', 'page') as $key => $val)
                     <input type="hidden" name="{{ $key }}" value="{{ $val }}">
                 @endforeach
-                <x-select name="rating" class="w-auto" onchange="this.form.submit()">
+                <x-select name="rating" class="w-auto" onchange="this.form.requestSubmit()">
                     <option value="">Semua Rating</option>
                     <option value="high" @selected($ratingFilter === 'high')>Tinggi (≥ 4)</option>
                     <option value="mid" @selected($ratingFilter === 'mid')>Sedang (3–3.9)</option>

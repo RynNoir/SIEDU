@@ -4,7 +4,7 @@
 
         {{-- Filter chip periode (GUIDELINE §6.6) --}}
         <form method="GET" class="flex items-center gap-2">
-            <x-select name="period_id" class="w-auto" onchange="this.form.submit()">
+            <x-select name="period_id" class="w-auto" onchange="this.form.requestSubmit()">
                 <option value="">Semua Periode</option>
                 @foreach ($periods as $period)
                     <option value="{{ $period->id }}" @selected((string) $selectedPeriodId === (string) $period->id)>{{ $period->name }}</option>

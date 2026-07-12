@@ -269,6 +269,23 @@ Peningkatan UX/craft menyeluruh memakai skill `impeccable` + `emil-design-eng` +
 
 ---
 
+### Fase 13.2 — Navigasi partial + transisi (htmx boost)
+
+Keluhan user: filter/pencarian dan pindah menu sidebar terasa kaku karena reload `<html>` penuh tiap interaksi (konsekuensi arsitektur Blade server-rendered murni). **Dependency baru `htmx.org` (~14KB) disetujui eksplisit oleh user** sebelum implementasi (lihat GUIDELINE.md §14.2 untuk detail teknis lengkap).
+
+- [x] `npm install htmx.org` (v2.0.10); diimpor & dipasang ke `window.htmx` di `resources/js/app.js`.
+- [x] `hx-boost="true"` + `hx-target`/`hx-select="#app-content"` pada `x-app-shell` (admin/dosen/kaprodi) dan `student-layout` — hanya konten yang ditukar, sidebar/topbar/bottom-nav tetap diam.
+- [x] Ganti 16 titik `this.form.submit()` → `this.form.requestSubmit()` (4 halaman admin + dashboard dosen/kaprodi + filter rating kesan&saran) — `submit()` tak memicu event `submit` sehingga htmx tak bisa mengintersepsinya.
+- [x] Transisi: View Transitions API (`transition:true`) + fallback CSS `.htmx-swapping`/`.htmx-added`/`.htmx-settling` (150–200ms, `ease-out-quart`); `::view-transition-*` dinetralkan eksplisit di `prefers-reduced-motion`.
+- [x] Indikator loading tipis (`.htmx-indicator`, strip 2px `bg-accent`) di tepi atas `#app-content` selama request.
+- [x] Jaring pengaman `htmx:beforeSwap` (`app.js`): kalau respons tak punya `#app-content` (redirect ke halaman berstruktur beda — paksa ganti password, error 403), batalkan swap parsial & navigasi penuh biasa.
+- [x] `hx-boost="false"` eksplisit pada semua form logout (app-shell + student-layout) — selalu navigasi penuh ke halaman login.
+- [x] Halaman auth (`layouts/guest`) sengaja tidak di-boost.
+- [x] Verifikasi: `php artisan test --compact` hijau (103 test — murni perubahan frontend, tanpa sentuh route/controller kecuali cara submit form di sisi klien), `vendor/bin/pint` bersih, `npm run build` sukses.
+- [ ] **Catatan**: perilaku AJAX/transisi tak bisa diverifikasi otomatis oleh Pest (server-side only) — perlu dicek manual via `npm run dev` di browser.
+
+---
+
 ## Catatan Perluasan dari PRD Asli
 
 Dua keputusan project ini **menambah/mengubah** skema 12-tabel asli PRD — dicatat di sini agar tidak terlewat:

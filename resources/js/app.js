@@ -1,6 +1,8 @@
 import Alpine from 'alpinejs';
+import htmx from 'htmx.org';
 
 window.Alpine = Alpine;
+window.htmx = htmx;
 
 Alpine.start();
 
@@ -42,4 +44,20 @@ document.addEventListener('submit', (event) => {
     window.requestAnimationFrame(() => {
         button.disabled = true;
     });
+});
+
+/**
+ * Jaring pengaman htmx boost: shell (app-shell/student-layout) dibungkus hx-boost
+ * dengan hx-select="#app-content" supaya sidebar/bottom-nav tak ikut tertukar saat
+ * navigasi. Tapi sebagian rute bisa mengarah ke halaman BERBEDA struktur (redirect
+ * paksa ganti password, halaman auth lain) yang tak punya #app-content sama sekali --
+ * kalau itu terjadi, jangan swap parsial (akan kosong/rusak), pindah halaman penuh saja.
+ */
+document.body.addEventListener('htmx:beforeSwap', (event) => {
+    const xhr = event.detail.xhr;
+    if (xhr && !xhr.responseText.includes('id="app-content"')) {
+        event.detail.shouldSwap = false;
+        event.detail.isError = false;
+        window.location.href = xhr.responseURL || window.location.href;
+    }
 });

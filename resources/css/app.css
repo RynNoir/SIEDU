@@ -70,4 +70,46 @@
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+
+    /* ::view-transition-* tidak tercakup oleh selector * di atas (bukan animation pada
+       elemen biasa) -- dimatikan eksplisit supaya navigasi htmx tetap instan (§8/§9). */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
+/*
+ * Transisi swap konten htmx (navigasi sidebar & filter live, GUIDELINE §8: 150-250ms,
+ * ease-out, tanpa bounce). Dipasangkan dengan hx-swap="innerHTML swap:150ms settle:200ms
+ * transition:true" pada #app-content. Browser modern (Chromium/Safari terbaru) otomatis
+ * dapat crossfade halus lewat View Transitions API; kelas di bawah jadi fallback yang
+ * tetap terasa "hidup" di browser lain, dan otomatis dinetralkan oleh blok reduced-motion
+ * di atas (transition-duration -> 0.01ms).
+ */
+#app-content.htmx-swapping {
+    opacity: 0;
+    transition: opacity 150ms var(--ease-out-quart);
+}
+
+#app-content.htmx-added {
+    opacity: 0;
+}
+
+#app-content.htmx-settling {
+    opacity: 1;
+    transition: opacity 200ms var(--ease-out-quart);
+}
+
+/* Indikator loading tipis di tepi atas konten saat request htmx berjalan (>200ms saja,
+   lewat delay bawaan .htmx-indicator agar tak "berkedip" untuk request yang sangat cepat). */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out-quart);
+}
+
+.htmx-request.htmx-indicator,
+.htmx-request .htmx-indicator {
+    opacity: 1;
 }

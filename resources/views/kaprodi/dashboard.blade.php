@@ -1,13 +1,13 @@
 <x-kaprodi-layout header="Dashboard Prodi {{ auth()->user()->studyProgram?->code }}">
     {{-- Filter: dosen & periode (§6.6). Filter prodi tak perlu — sudah otomatis. --}}
     <form method="GET" class="mb-6 flex flex-wrap items-center gap-2">
-        <x-select name="lecturer_id" class="w-auto" onchange="this.form.submit()">
+        <x-select name="lecturer_id" class="w-auto" onchange="this.form.requestSubmit()">
             <option value="">Semua Dosen</option>
             @foreach ($lecturers as $l)
                 <option value="{{ $l->id }}" @selected((string) $lecturerId === (string) $l->id)>{{ $l->name }}</option>
             @endforeach
         </x-select>
-        <x-select name="period_id" class="w-auto" onchange="this.form.submit()">
+        <x-select name="period_id" class="w-auto" onchange="this.form.requestSubmit()">
             <option value="">Semua Periode</option>
             @foreach ($periods as $p)
                 <option value="{{ $p->id }}" @selected((string) $periodId === (string) $p->id)>{{ $p->name }}</option>

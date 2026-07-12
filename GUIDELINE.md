@@ -407,3 +407,17 @@ Peningkatan kualitas UX/craft ke standar produk (Linear/Stripe-grade) **tanpa me
 - **Konsistensi (§6.1)**: sistem tombol tunggal `<x-button>` — komponen legacy `x-primary/secondary/danger-button` dipensiunkan; halaman auth memakai `<x-button>` + copy Indonesia.
 - **Tabel (§6.3)**: header **sticky** dalam kontainer scroll ber-tinggi-batas (`max-h-[70vh]`).
 - **Dark-mode ready (checklist #24)**: seluruh komponen sudah token-based (`bg-surface`/`text-ink`/dst), sehingga tema gelap tinggal menambah override token di masa depan tanpa menyentuh markup. Tidak diaktifkan sekarang.
+
+### 14.2 Navigasi Partial & Transisi (htmx boost)
+
+Masalah yang diperbaiki: setiap klik menu sidebar atau submit filter memicu **hard navigation** browser (reload `<html>` penuh) karena SIEDU murni server-rendered Blade — sidebar/topbar ikut di-render ulang dari nol, terasa kaku, dan mustahil diberi transisi (tak ada "momen" untuk CSS transition terjadi di antara dua dokumen HTML terpisah).
+
+**Solusi**: **htmx** (`htmx.org`, ~14KB, tanpa build tool tambahan) ditambahkan sebagai dependency JS kecil (disetujui eksplisit oleh user). `hx-boost="true"` dipasang pada elemen pembungkus shell (`x-app-shell`, `student-layout`) — ini membuat *semua* `<a>`/`<form>` di dalamnya otomatis jadi fetch AJAX progresif, dengan `hx-target`/`hx-select="#app-content"` supaya **hanya area konten yang ditukar** — sidebar, topbar/bottom-nav tetap diam. Backend/route/controller **tidak berubah sama sekali** — htmx tetap meminta halaman Blade penuh yang sama seperti biasa, hanya bagian `#app-content` dari respons yang diekstrak & disuntikkan.
+
+- **Filter live** (Fase 13 sebelumnya) otomatis dapat manfaat ganda: `onchange`/debounce sudah memicu submit form, kini form itu di-boost jadi partial-swap alih-alih reload — tabel saja yang berganti.
+- **`form.submit()` → `form.requestSubmit()`** di seluruh dropdown/pencarian live (16 titik) — `submit()` native TIDAK memicu event `submit` (kuirk platform lama), sehingga htmx tak bisa meng-intersepsinya; `requestSubmit()` memicu event asli dan tetap kompatibel mundur untuk browser tanpa JS.
+- **Transisi** (§8, 150–250ms, `ease-out-quart`): kombinasi View Transitions API (crossfade native di browser modern, lewat `hx-swap="...transition:true"`) + fallback CSS (`.htmx-swapping`/`.htmx-added`/`.htmx-settling`) untuk browser lain. **`prefers-reduced-motion`**: pseudo-element `::view-transition-*` dinetralkan eksplisit (tak tercakup wildcard `*` yang sudah ada), transisi CSS fallback otomatis ikut aturan global yang sudah ada.
+- **Indikator loading**: strip tipis `bg-accent` (`.htmx-indicator`, 2px) muncul di tepi atas `#app-content` selama request berlangsung — feedback halus tanpa spinner mengganggu (§13).
+- **Jaring pengaman** (`app.js`, event `htmx:beforeSwap`): sebagian rute (paksa ganti password, error 403, halaman auth lain) mengarah ke struktur halaman **berbeda** yang tak punya `#app-content` — kalau terdeteksi, batalkan swap parsial dan navigasi penuh biasa (`window.location`), supaya tak muncul konten kosong/rusak.
+- **Dikecualikan dari boost** (`hx-boost="false"` eksplisit): form logout — selalu navigasi penuh, bukan swap parsial, karena halaman login berstruktur berbeda total (tanpa sidebar).
+- Halaman auth (`layouts/guest`) **sengaja tidak di-boost** — tak ada sidebar untuk dipertahankan, dan transisi login→dashboard memang harus keluar sepenuhnya dari shell guest ke shell aplikasi.

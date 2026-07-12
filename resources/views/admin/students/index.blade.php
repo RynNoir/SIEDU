@@ -8,20 +8,20 @@
     <form method="GET" class="mb-4">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <x-text-input name="search" placeholder="Cari NIM / nama"
-                :value="request('search')" x-on:input.debounce.400ms="$el.form.submit()" />
-            <x-select name="study_program_id" onchange="this.form.submit()">
+                :value="request('search')" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
+            <x-select name="study_program_id" onchange="this.form.requestSubmit()">
                 <option value="">Semua Prodi</option>
                 @foreach ($studyPrograms as $prodi)
                     <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
                 @endforeach
             </x-select>
-            <x-select name="class_group_id" onchange="this.form.submit()">
+            <x-select name="class_group_id" onchange="this.form.requestSubmit()">
                 <option value="">Semua Kelas</option>
                 @foreach ($classGroups as $class)
                     <option value="{{ $class->id }}" @selected(request('class_group_id') == $class->id)>{{ $class->class_code }}</option>
                 @endforeach
             </x-select>
-            <x-select name="status" onchange="this.form.submit()">
+            <x-select name="status" onchange="this.form.requestSubmit()">
                 <option value="">Semua Status</option>
                 @foreach ($statuses as $status)
                     <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ ucfirst($status->value) }}</option>

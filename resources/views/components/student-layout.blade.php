@@ -16,7 +16,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="flex min-h-screen flex-col bg-canvas font-body text-ink antialiased">
+{{--
+    hx-boost: header/bottom-nav statis, hanya #app-content (main) yang ditukar htmx
+    saat pindah halaman (GUIDELINE §8 motion, tanpa reload penuh).
+--}}
+<body class="flex min-h-screen flex-col bg-canvas font-body text-ink antialiased"
+    hx-boost="true" hx-target="#app-content" hx-select="#app-content"
+    hx-swap="innerHTML swap:150ms settle:200ms transition:true">
     <header class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-8">
         <a href="{{ route('student.evaluations.index') }}" class="font-display text-lg font-semibold">SIEDU</a>
 
@@ -35,7 +41,7 @@
                             <span class="flex items-center gap-2"><x-icon name="profile" class="size-4 text-muted" /> Profil</span>
                         </x-dropdown-link>
                     @endif
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" hx-boost="false">
                         @csrf
                         <x-dropdown-link :href="route('logout')"
                             onclick="event.preventDefault(); this.closest('form').submit();">
@@ -47,7 +53,9 @@
         </div>
     </header>
 
-    <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 lg:pb-8">
+    <main id="app-content" class="relative mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 lg:pb-8">
+        <div class="htmx-indicator absolute inset-x-0 top-0 z-20 h-0.5 bg-accent"></div>
+
         @if ($header)
             <h1 class="mb-4 font-display text-2xl font-semibold">{{ $header }}</h1>
         @endif
@@ -84,7 +92,7 @@
                 Profil
             </a>
         @endif
-        <form method="POST" action="{{ route('logout') }}" class="flex-1">
+        <form method="POST" action="{{ route('logout') }}" class="flex-1" hx-boost="false">
             @csrf
             <button type="submit" class="flex w-full flex-col items-center gap-1 py-2 text-xs text-muted">
                 <x-icon name="logout" class="size-6" />

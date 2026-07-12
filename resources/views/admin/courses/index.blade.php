@@ -8,14 +8,14 @@
     <form method="GET" class="mb-4">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <x-text-input name="search" placeholder="Cari kode / nama mata kuliah"
-                :value="request('search')" x-on:input.debounce.400ms="$el.form.submit()" />
-            <x-select name="study_program_id" onchange="this.form.submit()">
+                :value="request('search')" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
+            <x-select name="study_program_id" onchange="this.form.requestSubmit()">
                 <option value="">Semua Prodi</option>
                 @foreach ($studyPrograms as $prodi)
                     <option value="{{ $prodi->id }}" @selected(request('study_program_id') == $prodi->id)>{{ $prodi->code }}</option>
                 @endforeach
             </x-select>
-            <x-select name="semester" onchange="this.form.submit()">
+            <x-select name="semester" onchange="this.form.requestSubmit()">
                 <option value="">Semua Semester</option>
                 @foreach ($semesters as $sem)
                     <option value="{{ $sem }}" @selected((string) request('semester') === (string) $sem)>Semester {{ $sem }}</option>
