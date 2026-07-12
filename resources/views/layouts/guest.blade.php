@@ -18,20 +18,38 @@
 </head>
 
 <body class="font-body text-ink antialiased">
-    {{-- Split edge-to-edge: form sempit kiri, ilustrasi lebar kanan (GUIDELINE §13.7) --}}
-    <div class="grid min-h-screen lg:grid-cols-[440px_1fr]">
-        <div class="flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-14">
-            <div class="mx-auto w-full max-w-sm">
-                <a href="/" class="mb-10 inline-flex items-center gap-2">
-                    <span class="font-display text-2xl leading-none text-rating">⬥</span>
-                    <span class="font-display text-lg font-semibold text-ink">SIEDU</span>
-                </a>
+    <div class="flex min-h-screen items-center justify-center bg-canvas p-4">
+        {{-- Kartu split mengambang ala Elegent: shadow besar, radius besar, dua kolom (GUIDELINE §13.7) --}}
+        <div class="grid w-full max-w-4xl overflow-hidden rounded-card bg-surface shadow-xl lg:grid-cols-2">
+            {{-- Panel identitas --}}
+            <div class="flex flex-col justify-between bg-ink p-8 text-canvas lg:p-10">
+                <a href="/" class="font-display text-xl font-semibold text-white">SIEDU</a>
 
-                {{ $slot }}
+                <div class="hidden lg:block">
+                    <h1 class="font-display text-2xl font-semibold leading-tight text-white">
+                        Sistem Evaluasi<br>Dosen Terpadu
+                    </h1>
+                    <p class="mt-4 max-w-sm text-sm leading-relaxed text-canvas/70">
+                        Instrumen evaluasi dosen yang presisi dan terukur untuk Jurusan Teknologi Informasi —
+                        penilaian sebagai pembacaan data, bukan rating konsumen.
+                    </p>
+                    <div class="mt-6 flex items-center gap-1.5 text-rating" aria-hidden="true">
+                        <span>⬥</span><span>⬥</span><span>⬥</span><span>⬥</span><span class="text-canvas/30">⬥</span>
+                    </div>
+                </div>
+
+                <p class="hidden text-xs text-canvas/50 lg:block">
+                    Politeknik Negeri Padang · Jurusan Teknologi Informasi
+                </p>
+            </div>
+
+            {{-- Kolom form --}}
+            <div class="flex items-center justify-center p-8 lg:p-10">
+                <div class="w-full max-w-sm">
+                    {{ $slot }}
+                </div>
             </div>
         </div>
-
-        <x-auth-illustration />
     </div>
 </body>
 
