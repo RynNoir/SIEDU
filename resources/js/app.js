@@ -61,3 +61,43 @@ document.body.addEventListener('htmx:beforeSwap', (event) => {
         window.location.href = xhr.responseURL || window.location.href;
     }
 });
+
+/**
+ * Sinkronisasi status "aktif" sidebar & bottom-nav setelah navigasi boosted.
+ * Nav persisten (sidebar/bottom-nav) sengaja di luar #app-content supaya tak ikut
+ * ditukar/flicker -- tapi berarti status aktifnya (dihitung server-side saat render
+ * awal) jadi basi setelah pindah halaman. Sebelumnya ditangani via hx-swap-oob, tapi
+ * itu meng-outerHTML-replace <nav> yang berisi link yang SEDANG diklik (ancestor dari
+ * elemen pemicu event htmx) -- pitfall yang menyebabkan DOM ganda/sidebar tampak dobel.
+ * Solusi ini murni toggle class lewat perbandingan location.pathname, tanpa mengganti
+ * elemen DOM sama sekali.
+ */
+function syncNavActiveState() {
+    document.querySelectorAll('[data-nav-link]').forEach((link) => {
+        const base = link.dataset.navMatch;
+        if (!base) {
+            return;
+        }
+
+        const active = window.location.pathname === base || window.location.pathname.startsWith(base + '/');
+        const activeClasses = (link.dataset.navActive || '').split(/\s+/).filter(Boolean);
+        const inactiveClasses = (link.dataset.navInactive || '').split(/\s+/).filter(Boolean);
+
+        link.classList.remove(...activeClasses, ...inactiveClasses);
+        link.classList.add(...(active ? activeClasses : inactiveClasses));
+
+        const icon = link.querySelector('[data-nav-icon]');
+        if (icon) {
+            const iconActiveClasses = (icon.dataset.navIconActive || '').split(/\s+/).filter(Boolean);
+            const iconInactiveClasses = (icon.dataset.navIconInactive || '').split(/\s+/).filter(Boolean);
+
+            icon.classList.remove(...iconActiveClasses, ...iconInactiveClasses);
+            icon.classList.add(...(active ? iconActiveClasses : iconInactiveClasses));
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', syncNavActiveState);
+document.body.addEventListener('htmx:afterSettle', syncNavActiveState);
+document.body.addEventListener('htmx:pushedIntoHistory', syncNavActiveState);
+window.addEventListener('popstate', syncNavActiveState);

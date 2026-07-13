@@ -71,14 +71,17 @@
     </main>
 
     {{--
-        Bottom-nav mobile (§10). hx-swap-oob: nav ini di luar #app-content (sengaja, biar
-        tak ikut flicker), tapi status aktifnya dihitung ulang tiap request (request()->routeIs())
-        -- tanpa OOB, status aktif jadi basi setelah navigasi boosted karena nav tak pernah
-        ikut ditukar (bug yang sama seperti sidebar admin, lihat GUIDELINE §14.2).
+        Bottom-nav mobile (§10). Nav ini di luar #app-content (sengaja, biar tak ikut flicker).
+        TIDAK pakai hx-swap-oob: link yang diklik ada DI DALAM <nav> ini, jadi meng-OOB-swap
+        seluruh <nav> berarti outerHTML-replace ancestor dari elemen pemicu itu sendiri di
+        tengah proses request htmx -- pitfall yang menyebabkan DOM ganda/rusak (lihat catatan
+        sama di app-shell.blade.php). Sinkronisasi status aktif lewat JS ringan (app.js) di
+        event htmx:afterSettle, cuma toggle class tanpa mengganti elemen DOM.
     --}}
-    <nav id="bottom-nav" hx-swap-oob="true"
+    <nav id="bottom-nav"
         class="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] sm:hidden">
-        <a href="{{ route('student.evaluations.index') }}"
+        <a href="{{ route('student.evaluations.index') }}" data-nav-link data-nav-match="{{ parse_url(route('student.evaluations.index'), PHP_URL_PATH) }}"
+            data-nav-active="text-accent" data-nav-inactive="text-muted"
             @class([
                 'flex flex-1 flex-col items-center gap-1 py-2 text-xs',
                 'text-accent' => request()->routeIs('student.evaluations.*'),
@@ -88,7 +91,8 @@
             Evaluasi
         </a>
         @if (Route::has('profile.edit'))
-            <a href="{{ route('profile.edit') }}"
+            <a href="{{ route('profile.edit') }}" data-nav-link data-nav-match="{{ parse_url(route('profile.edit'), PHP_URL_PATH) }}"
+                data-nav-active="text-accent" data-nav-inactive="text-muted"
                 @class([
                     'flex flex-1 flex-col items-center gap-1 py-2 text-xs',
                     'text-accent' => request()->routeIs('profile.*'),

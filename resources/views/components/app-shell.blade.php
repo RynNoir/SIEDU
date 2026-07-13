@@ -47,24 +47,32 @@
             </div>
 
             {{--
-                hx-swap-oob: nav ini TIDAK termasuk area #app-content (sengaja, biar sidebar
-                tak ikut nge-flicker), tapi status "aktif"-nya dihitung ulang tiap request
-                (request()->routeIs()) -- tanpa OOB, status aktif jadi basi setelah navigasi
-                boosted karena nav tak pernah ikut ditukar. hx-swap-oob="true" bikin htmx
-                tetap mencari & menukar elemen ber-id ini di mana pun ia muncul di respons,
-                di luar mekanisme hx-target/hx-select utama.
+                Nav ini TIDAK termasuk area #app-content (sengaja, biar sidebar tak ikut
+                nge-flicker), tapi status "aktif"-nya dihitung server-side (request()->routeIs()).
+                TIDAK pakai hx-swap-oob di sini: link yang diklik ada DI DALAM <nav> ini, jadi
+                meng-OOB-swap seluruh <nav> berarti meng-outerHTML-replace ancestor dari elemen
+                pemicu itu sendiri di tengah proses request htmx -- pitfall dikenal yang
+                menyebabkan DOM ganda/rusak (sidebar tampak dobel). Sinkronisasi status aktif
+                dilakukan lewat JS ringan (app.js: syncNavActiveState) di event htmx:afterSettle,
+                yang hanya toggle class tanpa mengganti elemen DOM sama sekali.
             --}}
-            <nav id="sidebar-nav" hx-swap-oob="true" class="flex-1 space-y-1 overflow-y-auto p-4">
+            <nav id="sidebar-nav" class="flex-1 space-y-1 overflow-y-auto p-4">
                 @foreach ($navItems as $item)
                     @if (! isset($item['route']) || Route::has($item['route']))
-                        @php $active = request()->routeIs($item['pattern'] ?? $item['route']); @endphp
-                        <a href="{{ isset($item['route']) ? route($item['route']) : '#' }}"
+                        @php
+                            $active = request()->routeIs($item['pattern'] ?? $item['route']);
+                            $href = isset($item['route']) ? route($item['route']) : '#';
+                            $matchPath = isset($item['route']) ? parse_url($href, PHP_URL_PATH) : null;
+                        @endphp
+                        <a href="{{ $href }}" data-nav-link data-nav-match="{{ $matchPath }}"
+                            data-nav-active="bg-accent font-medium text-white" data-nav-inactive="text-ink hover:bg-accent-soft"
                             @class([
                                 'flex items-center gap-3 rounded-input px-3 py-2.5 text-sm transition duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
                                 'bg-accent font-medium text-white' => $active,
                                 'text-ink hover:bg-accent-soft' => ! $active,
                             ])>
-                            <x-icon :name="$item['icon'] ?? 'dashboard'"
+                            <x-icon data-nav-icon data-nav-icon-active="text-white" data-nav-icon-inactive="text-muted"
+                                :name="$item['icon'] ?? 'dashboard'"
                                 @class(['size-5 shrink-0', 'text-white' => $active, 'text-muted' => ! $active]) />
                             <span class="truncate">{{ $item['label'] }}</span>
                         </a>

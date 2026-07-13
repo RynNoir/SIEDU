@@ -84,3 +84,25 @@ test('filter penugasan dosen: per mata kuliah, dosen, kelas, dan periode', funct
         ->assertOk();
     expect($byCourse->viewData('assignments')->pluck('course_id')->all())->toBe([$courseB->id]);
 });
+
+test('filter dashboard dosen: per mata kuliah dan kelas (dibatasi ke penugasan sendiri)', function () {
+    $prodi = StudyProgram::factory()->create();
+    $class = ClassGroup::factory()->create(['study_program_id' => $prodi->id]);
+    $courseA = Course::factory()->create(['study_program_id' => $prodi->id, 'code' => 'DA1']);
+    $courseB = Course::factory()->create(['study_program_id' => $prodi->id, 'code' => 'DB1']);
+    $dosen = Lecturer::factory()->create(['study_program_id' => $prodi->id]);
+    $periodA = EvaluationPeriod::factory()->create();
+
+    CourseClassAssignment::factory()->create([
+        'course_id' => $courseA->id, 'lecturer_id' => $dosen->id,
+        'class_group_id' => $class->id, 'evaluation_period_id' => $periodA->id,
+    ]);
+    CourseClassAssignment::factory()->create([
+        'course_id' => $courseB->id, 'lecturer_id' => $dosen->id,
+        'class_group_id' => $class->id, 'evaluation_period_id' => $periodA->id,
+    ]);
+
+    $byCourse = $this->actingAs($dosen->user)->get(route('lecturer.dashboard', ['course_id' => $courseA->id]))
+        ->assertOk();
+    expect($byCourse->viewData('assignments')->pluck('course_id')->all())->toBe([$courseA->id]);
+});
