@@ -19,9 +19,12 @@
 {{--
     hx-boost: header/bottom-nav statis, hanya #app-content (main) yang ditukar htmx
     saat pindah halaman (GUIDELINE §8 motion, tanpa reload penuh).
+    hx-sync="this:replace": klik ganda pada elemen yang sama membatalkan request lama,
+    mencegah dua respons tumpang tindih memicu transisi ganda (lihat catatan sama di
+    app-shell.blade.php).
 --}}
 <body class="flex min-h-screen flex-col bg-canvas font-body text-ink antialiased"
-    hx-boost="true" hx-target="#app-content" hx-select="#app-content"
+    hx-boost="true" hx-target="#app-content" hx-select="#app-content" hx-sync="this:replace"
     hx-swap="innerHTML swap:150ms settle:200ms transition:true">
     <header class="flex h-16 items-center justify-between border-b border-border bg-surface px-4 lg:px-8">
         <a href="{{ route('student.evaluations.index') }}" class="font-display text-lg font-semibold">SIEDU</a>

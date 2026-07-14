@@ -27,9 +27,13 @@
         hx-boost: semua <a>/<form> di dalam sini otomatis jadi fetch AJAX (htmx),
         hanya #app-content yang ditukar -- sidebar & topbar tetap diam saat pindah menu
         atau submit filter (GUIDELINE §8 motion, tanpa reload penuh).
+        hx-sync="this:replace": kalau elemen yang sama (mis. tombol "Tambah Data")
+        diklik berkali-kali sebelum respons pertama datang, request lama dibatalkan
+        dan diganti request baru -- tanpa ini, dua respons yang tumpang tindih bisa
+        memicu dua transisi View Transition sekaligus dan membuat sidebar tampak dobel.
     --}}
     <div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex"
-        hx-boost="true" hx-target="#app-content" hx-select="#app-content"
+        hx-boost="true" hx-target="#app-content" hx-select="#app-content" hx-sync="this:replace"
         hx-swap="innerHTML swap:150ms settle:200ms transition:true">
         {{-- Overlay mobile --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="fixed inset-0 z-20 bg-ink/40 lg:hidden"></div>
