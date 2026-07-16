@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.testing
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -25,3 +26,12 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Tooling agen AI (Claude Code/dsb.) -- skill/hook lokal per mesin, bukan kode aplikasi
+/.agents/
+/.claude/settings.local.json
+/.claude/skills/
+/skills-lock.json
+
+# Workspace editor personal (berisi path lokal spesifik per developer)
+*.code-workspace
