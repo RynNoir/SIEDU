@@ -1,4 +1,12 @@
 <x-admin-layout header="Promosi Semester">
+    @if ($blockingPeriod)
+        <x-alert type="warning" :dismissible="false" class="mb-4 max-w-xl">
+            Periode evaluasi <span class="font-medium">{{ $blockingPeriod->name }}</span> masih dibuka.
+            Tutup dulu periode tersebut sebelum menaikkan semester — mahasiswa yang pindah kelas akan
+            kehilangan akses ke evaluasi yang belum sempat diisi.
+        </x-alert>
+    @endif
+
     <x-card class="max-w-xl">
         <p class="text-sm text-muted">
             Menaikkan mahasiswa aktif <span class="font-medium text-ink">satu semester</span> dari periode yang dipilih.
@@ -29,7 +37,7 @@
                 </div>
             </div>
 
-            <x-button type="submit">Jalankan Promosi</x-button>
+            <x-button type="submit" :variant="$blockingPeriod ? 'disabled' : 'primary'">Jalankan Promosi</x-button>
         </form>
     </x-card>
 </x-admin-layout>

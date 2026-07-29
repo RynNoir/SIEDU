@@ -13,7 +13,8 @@ class PromoteSemester extends Command
      */
     protected $signature = 'semester:promote
                             {academicYear : Tahun ajaran periode asal (mis. 2025/2026)}
-                            {semesterType : Tipe semester periode asal: ganjil atau genap}';
+                            {semesterType : Tipe semester periode asal: ganjil atau genap}
+                            {--force : Jalankan walau masih ada periode evaluasi yang dibuka}';
 
     /**
      * @var string
@@ -27,6 +28,14 @@ class PromoteSemester extends Command
 
         if (! $semesterType) {
             $this->error('Tipe semester harus "ganjil" atau "genap".');
+
+            return self::FAILURE;
+        }
+
+        if (! $this->option('force') && $blocking = $service->blockingPeriod()) {
+            $this->error("Periode evaluasi \"{$blocking->name}\" masih dibuka.");
+            $this->line('Mahasiswa yang pindah kelas akan kehilangan akses ke evaluasi yang belum diisi.');
+            $this->line('Tutup periode tersebut dulu, atau jalankan ulang dengan --force.');
 
             return self::FAILURE;
         }

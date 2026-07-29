@@ -3,8 +3,10 @@
 use App\Enums\SemesterType;
 use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
+use App\Models\EvaluationPeriod;
 use App\Models\Student;
 use App\Models\StudyProgram;
+use App\Models\User;
 use App\Services\SemesterPromotionService;
 
 /**
@@ -239,4 +241,44 @@ test('command semester:promote menaikkan semester mahasiswa', function () {
 test('command semester:promote menolak tipe semester yang tidak dikenal', function () {
     $this->artisan('semester:promote', ['academicYear' => '2025/2026', 'semesterType' => 'pendek'])
         ->assertFailed();
+});
+
+test('promosi diblokir lewat web selama masih ada periode evaluasi dibuka', function () {
+    $admin = User::factory()->admin()->create();
+    $class = makeClass(yearLevel: 1);
+    $student = makeStudent($class, semester: 1);
+    EvaluationPeriod::factory()->open()->create(['name' => 'Ganjil 2025/2026']);
+
+    $this->actingAs($admin)->post(route('admin.semester-promotion.run'), [
+        'academic_year' => '2025/2026', 'semester_type' => 'ganjil',
+    ])->assertSessionHas('error');
+
+    expect($student->fresh()->current_semester)->toBe(1);
+});
+
+test('promosi lewat web berjalan setelah periode evaluasi ditutup', function () {
+    $admin = User::factory()->admin()->create();
+    $class = makeClass(yearLevel: 1);
+    $student = makeStudent($class, semester: 1);
+    EvaluationPeriod::factory()->closed()->create();
+
+    $this->actingAs($admin)->post(route('admin.semester-promotion.run'), [
+        'academic_year' => '2025/2026', 'semester_type' => 'ganjil',
+    ])->assertSessionHas('success');
+
+    expect($student->fresh()->current_semester)->toBe(2);
+});
+
+test('command semester:promote diblokir periode terbuka kecuali pakai --force', function () {
+    $class = makeClass(yearLevel: 1);
+    $student = makeStudent($class, semester: 1);
+    EvaluationPeriod::factory()->open()->create();
+
+    $this->artisan('semester:promote', ['academicYear' => '2025/2026', 'semesterType' => 'ganjil'])
+        ->assertFailed();
+    expect($student->fresh()->current_semester)->toBe(1);
+
+    $this->artisan('semester:promote', ['academicYear' => '2025/2026', 'semesterType' => 'ganjil', '--force' => true])
+        ->assertSuccessful();
+    expect($student->fresh()->current_semester)->toBe(2);
 });

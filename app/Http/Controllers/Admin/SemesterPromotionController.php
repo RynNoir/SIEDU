@@ -12,13 +12,22 @@ use Illuminate\View\View;
 
 class SemesterPromotionController extends Controller
 {
-    public function index(): View
+    public function index(SemesterPromotionService $service): View
     {
-        return view('admin.semester-promotion.index');
+        return view('admin.semester-promotion.index', [
+            'blockingPeriod' => $service->blockingPeriod(),
+        ]);
     }
 
     public function run(Request $request, SemesterPromotionService $service): RedirectResponse
     {
+        if ($blocking = $service->blockingPeriod()) {
+            return back()->with('error', sprintf(
+                'Tutup dulu periode evaluasi "%s" sebelum menaikkan semester — mahasiswa yang pindah kelas akan kehilangan akses ke evaluasi yang belum diisi.',
+                $blocking->name,
+            ));
+        }
+
         $validated = $request->validate([
             'academic_year' => ['required', 'regex:/^\d{4}\/\d{4}$/'],
             'semester_type' => ['required', Rule::enum(SemesterType::class)],

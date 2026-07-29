@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\SemesterType;
 use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
+use App\Models\EvaluationPeriod;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +74,19 @@ class SemesterPromotionService
 
             return $summary;
         });
+    }
+
+    /**
+     * Periode evaluasi yang masih dibuka dan karenanya memblokir promosi.
+     *
+     * Menaikkan semester saat periode masih open akan memindahkan mahasiswa ke
+     * kelas baru, sehingga daftar evaluasinya langsung berganti mengikuti kelas
+     * tersebut dan evaluasi yang belum sempat diisi tak bisa lagi diakses —
+     * padahal periodenya masih berjalan. Admin harus menutup periodenya dulu.
+     */
+    public function blockingPeriod(): ?EvaluationPeriod
+    {
+        return EvaluationPeriod::open()->first();
     }
 
     /**
