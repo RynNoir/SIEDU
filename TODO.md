@@ -4,7 +4,11 @@ Langkah pembangunan project berdasarkan [PRD.md](PRD.md) (fungsional) dan [GUIDE
 
 **Aturan implementasi UI**: setiap task yang menyentuh tampilan (Fase 0, 5, 7, 8, 9, 10) **wajib** mengikuti token warna/tipografi/komponen di GUIDELINE.md — jangan pakai palet/komponen Tailwind default begitu saja. Referensi bagian GUIDELINE.md dicantumkan inline di tiap task terkait.
 
-**Status project saat ini**: **Fase 0–12 selesai (2026-07-12) — project SIEDU rampung, UI diperkaya, bug validasi semester-periode diperbaiki.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); ClassPromotionService + command `class:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
+**Status project saat ini**: **Fase 0–12 selesai (2026-07-12) — project SIEDU rampung, UI diperkaya, bug validasi semester-periode diperbaiki.** Ringkasan: Laravel 13 + MySQL, Breeze (Blade) + Tailwind v4 + design token GUIDELINE.md; 12 tabel migrasi + model/relasi/enum; seeder terstruktur (5 prodi, admin, kaprodi, kelas, MK, dosen, mahasiswa, pertanyaan, periode, assignment + team teaching, evaluasi dummy); autentikasi 4 role + force-change-password; modul admin (8 CRUD master data + layout sidebar); SemesterPromotionService + command `semester:promote`; modul mahasiswa (daftar evaluasi + form Rating Gauge + anti-submit-ganda); modul dosen (dashboard hasil + kesan & saran anonim + threshold); modul kaprodi (reuse service/partial dosen, dibatasi prodi); audit UI/GUIDELINE menyeluruh + reskin komponen Breeze bawaan; test E2E, keamanan, dan arch. `php artisan test --compact` hijau (93 test), `npm run build` sukses.
+
+**Revisi setelah rampung:**
+- **UI Elegent-style + htmx** (2026-07-14) — redesign shell shadow-first, navigasi boosted tanpa reload penuh, live filter yang hanya menukar `#results`, mobile-friendly role mahasiswa.
+- **[v1.3] Promosi semester** (2026-07-29) — koreksi model: promosi naik **1 semester per periode**, bukan 1 tingkat kelas per tahun. Ditambah kolom `students.enrollment_year` (tahun angkatan), kelulusan otomatis, pratinjau dry-run, dan guard periode evaluasi terbuka. Lihat Fase 6 & PRD §6.1. `php artisan test --compact` hijau (121 test).
 
 **Ringkasan keputusan kunci dari PRD** (baca sebelum mulai):
 - 4 role: `admin`, `lecturer`, `student`, **`kaprodi`** (role terpisah — keputusan project, lihat bawah) — semua akun dibuat admin, tidak ada self-registration.
@@ -133,16 +137,23 @@ Grup route `admin` + middleware role. Controller resourceful, FormRequest untuk 
 
 ---
 
-## Fase 6 — ClassPromotionService (Promosi Kelas Tahunan)
+## Fase 6 — SemesterPromotionService (Promosi Semester)
 
-Implementasi PRD §6.1. Service class + command Artisan + (opsional) tombol admin.
+Implementasi PRD §6.1. Service class + command Artisan + halaman admin.
 
-- [x] `app/Services/ClassPromotionService.php` via `make:class`. Method `promote(string $fromAcademicYear, string $toAcademicYear)`.
-- [x] Logika: ambil `class_groups` tahun berjalan → skip yang sudah `year_level` maksimum prodi (lulus) → buat `class_groups` baru (`year_level+1`, `class_letter` sama, `class_code` regen) → pindahkan mahasiswa `status=aktif` ke kelas baru + `current_semester += 2`.
+> **[REVISI v1.3 — 2026-07-29]** Fase ini semula dibangun sebagai promosi *kelas tahunan* (`current_semester += 2` sekali setahun). Itu salah model: perkuliahan berjalan per periode ganjil/genap, jadi promosi naik **1 semester per periode** dan kenaikan kelas hanya efek samping di pergantian genap → ganjil. Seluruh fitur ditulis ulang; centang di bawah mencerminkan keadaan setelah revisi.
+
+- [x] `app/Services/SemesterPromotionService.php`. Method `promote(string $academicYear, SemesterType $semesterType)` — periode tujuan diturunkan otomatis, tidak diminta dari pemanggil.
+- [x] Logika ganjil → genap: `current_semester + 1`, kelas & tahun ajaran **tetap**.
+- [x] Logika genap → ganjil: `current_semester + 1` + buat/temukan `class_groups` baru (`year_level+1`, `class_letter` sama, `class_code` regen) di tahun ajaran berikutnya.
+- [x] Filter paritas semester untuk menjaga idempotensi (periode ganjil hanya menaikkan semester ganjil, dst.) — tanpa ini transisi ganjil → genap yang tidak memindahkan kelas akan +2 kalau dijalankan dua kali.
+- [x] Kelulusan otomatis: `current_semester >= total_semesters` → `status = lulus`, kelas & semester terakhir dipertahankan sebagai histori.
 - [x] Kecualikan `cuti` (assignment manual nanti) dan `DO` (tetap di kelas terakhir untuk histori).
-- [x] Bungkus dalam DB transaction; idempotent/aman bila dijalankan dua kali (cek kelas tujuan sudah ada).
-- [x] Command `php artisan class:promote {fromYear} {toYear}` memanggil service.
-- [x] Unit/feature test skenario: mahasiswa aktif naik, cuti tetap, DO tetap, kelas tahun akhir tidak dinaikkan (lulus).
+- [x] Bungkus dalam DB transaction; idempotent/aman bila dijalankan dua kali.
+- [x] Command `php artisan semester:promote {academicYear} {semesterType} {--force}`.
+- [x] Pratinjau (dry-run) read-only di halaman admin, berbagi `buildPlan()` dengan eksekusi supaya tidak bisa melenceng.
+- [x] Blokir promosi selama ada `evaluation_periods` berstatus `open` (CLI bisa `--force`).
+- [x] Feature test: siklus penuh sem 1→6, idempotensi dua arah, paritas tidak cocok = no-op, mahasiswa tertinggal karena cuti, cuti/DO tetap, D4 sampai sem 8, kelulusan, angkatan tak berubah, guard periode, pratinjau read-only & konsisten dengan eksekusi.
 
 ---
 
@@ -202,7 +213,7 @@ PRD §6.5 awalnya menyebut kaprodi opsional; **project ini menetapkan kaprodi se
 - [x] Validasi form lengkap + pesan error ramah (bahasa Indonesia, langsung ke inti masalah — GUIDELINE.md §6.2, §12).
 - [x] Review keamanan: cek ulang tidak ada kebocoran `student_id` (grep bersih di `resources/views/` + `SecurityTest`); middleware role menutup semua route (dataset test); mass-assignment aman (semua model punya `#[Fillable]`); `.env` tidak ter-commit.
 - [x] Jalankan `vendor/bin/pint --format agent` untuk seluruh PHP.
-- [x] Suite Pest E2E: alur penuh admin→assign→mahasiswa isi→dosen lihat hasil; jalur team teaching; promosi kelas (`EndToEndFlowTest`). Ditambah `ArchTest` (no debug leftover, suffix Controller/Request, enum).
+- [x] Suite Pest E2E: alur penuh admin→assign→mahasiswa isi→dosen lihat hasil; jalur team teaching; promosi semester ganjil→genap→ganjil (`EndToEndFlowTest`). Ditambah `ArchTest` (no debug leftover, suffix Controller/Request, enum).
 - [x] `php artisan test --compact` hijau (93 test, 242 assertion).
 - [ ] (Opsional) Browser/smoke test halaman utama tiap role (Pest 4 browser) untuk cek error JS. **Dilewati** — butuh instalasi `pestphp/pest-plugin-browser` + Playwright (dependency baru), di luar cakupan otomatis sesi ini.
 - [x] `npm run build` untuk aset produksi.

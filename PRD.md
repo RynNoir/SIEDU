@@ -58,11 +58,15 @@ Kelas adalah **kohort yang naik tingkat bersama** dari tahun ke tahun — bukan 
 
 - Mahasiswa yang masuk di `MI1B` akan otomatis menjadi `MI2B` di tahun ajaran berikutnya, `MI3B` di tahun setelahnya, dst.
 - Anggota kelas **tidak berubah** kecuali ada mahasiswa DO atau cuti.
-- Setiap tahun ajaran baru, dijalankan **proses "promosi kelas"** (lihat bagian 6.1) yang membuat `class_groups` baru dengan `year_level + 1` dan `class_letter` yang sama, lalu memindahkan mahasiswa aktif ke kelas baru tersebut.
+- Satu `class_group` membentang **dua semester** dalam satu tahun ajaran: `MI1B` pada tahun ajaran 2025/2026 mencakup semester 1 (ganjil) dan semester 2 (genap). Karena itu `class_groups` tidak punya kolom semester.
+- Perpindahan kelas hanya terjadi di pergantian **genap → ganjil**, lewat **proses "promosi semester"** (lihat bagian 6.1) yang membuat `class_groups` baru dengan `year_level + 1` dan `class_letter` yang sama.
+
+**Identitas kohort:** kohort teridentifikasi oleh pasangan **`enrollment_year` + `class_letter`**, bukan `class_letter` saja — `MI1A` angkatan 2025 dan `MI1A` angkatan 2026 sama-sama ber-`class_letter` `A`. `enrollment_year` disimpan eksplisit di `students` dan bersifat **immutable**: tidak pernah diubah oleh promosi semester maupun kelulusan, sehingga tetap valid sebagai penanda kohort setelah mahasiswa lulus.
 
 **Penanganan kasus khusus:**
 - **Mahasiswa DO**: status diubah menjadi `DO`, tidak ikut proses promosi, `class_group_id` tetap menunjuk ke kelas terakhir aktif (untuk histori).
-- **Mahasiswa cuti**: status diubah menjadi `cuti`, tidak ikut promosi otomatis. Saat aktif kembali, admin melakukan **assignment manual** ke `class_group` dengan `class_letter` sama namun `year_level` yang sesuai dengan semester dia saat itu.
+- **Mahasiswa cuti**: status diubah menjadi `cuti`, tidak ikut promosi otomatis. Saat aktif kembali, admin melakukan **assignment manual** ke `class_group` dengan `class_letter` sama namun `year_level` yang sesuai dengan semester dia saat itu. Mahasiswa seperti ini akan **tertinggal dari kelasnya** (mis. semester 1 di kelas tahun 2); promosi menanganinya dengan benar karena keputusan diambil dari `current_semester` tiap mahasiswa, bukan dari `year_level` kelasnya.
+- **Mahasiswa lulus**: setelah menuntaskan semester terakhir prodinya, status otomatis menjadi `lulus`. `class_group_id` dan `current_semester` dibiarkan di nilai terakhir sebagai histori, dan `enrollment_year` menjadi penanda kohort alumninya.
 
 ### 2.4 Kurikulum Paket (Fixed Curriculum)
 
@@ -167,6 +171,7 @@ Kelas adalah **kohort yang naik tingkat bersama** dari tahun ke tahun — bukan 
 | nim | string, unique | |
 | name | string | |
 | study_program_id | FK → study_programs | |
+| enrollment_year | smallint unsigned | tahun angkatan (tahun masuk kampus), mis. `2025`. **Immutable** — tidak diubah oleh promosi maupun kelulusan |
 | class_group_id | FK → class_groups | kelas saat ini |
 | current_semester | tinyint | 1–8 |
 | status | enum('aktif','cuti','DO','lulus') | |
@@ -270,24 +275,48 @@ Setelah kuesioner bintang, mahasiswa mengisi 2 kolom teks bebas:
 
 ## 6. Business Logic & Alur Kerja
 
-### 6.1 Proses Promosi Kelas Tahunan (Admin, Sekali per Tahun Ajaran)
+### 6.1 Proses Promosi Semester (Admin, Sekali per Periode)
 
-Dijalankan sekali di awal tahun ajaran baru:
+**[REVISI v1.3]** Sebelumnya proses ini dirancang sebagai promosi *tahunan* dengan `current_semester + 2`. Itu keliru: perkuliahan berjalan **per periode ganjil/genap**, jadi promosi dijalankan **sekali tiap periode** dan menaikkan **satu semester**. Kenaikan kelas hanya efek samping pada pergantian genap → ganjil.
 
-1. Ambil semua `class_groups` di tahun ajaran berjalan.
-2. Untuk tiap kelas, jika `year_level` sudah mencapai batas maksimum prodi (misal D3 sudah di tahun 3), skip — kelas ini lulus, tidak dinaikkan lagi.
-3. Jika belum, buat `class_groups` baru dengan:
-   - `year_level = year_level_lama + 1`
-   - `class_letter` **sama** dengan kelas lama
-   - `class_code` digenerate ulang sesuai `year_level` baru
-4. Pindahkan semua mahasiswa dengan `status = 'aktif'` di kelas lama ke `class_group_id` baru, dan tambahkan `current_semester + 2`.
+Admin memilih **periode asal** (tahun ajaran + tipe semester). Periode tujuan diturunkan otomatis:
+
+| Periode asal | Semester | Kelas | Tahun ajaran |
+|---|---|---|---|
+| **Ganjil** → genap | +1 | tetap | tetap |
+| **Genap** → ganjil | +1 | naik satu tingkat | tahun berikutnya |
+
+Contoh satu siklus penuh D3 (6 semester) untuk kohort `MI...A`:
+
+| Promosi ke- | Periode asal | Sem | Kelas | → Sem | → Kelas | → Tahun ajaran |
+|---|---|---|---|---|---|---|
+| 1 | Ganjil 2025/2026 | 1 | MI1A | 2 | MI1A | 2025/2026 |
+| 2 | Genap 2025/2026 | 2 | MI1A | 3 | **MI2A** | **2026/2027** |
+| 3 | Ganjil 2026/2027 | 3 | MI2A | 4 | MI2A | 2026/2027 |
+| 4 | Genap 2026/2027 | 4 | MI2A | 5 | **MI3A** | **2027/2028** |
+| 5 | Ganjil 2027/2028 | 5 | MI3A | 6 | MI3A | 2027/2028 |
+| 6 | Genap 2027/2028 | 6 | MI3A | — | **LULUS** | — |
+
+**Aturan:**
+
+1. Ambil semua `class_groups` pada tahun ajaran periode asal.
+2. Ambil mahasiswa `status = 'aktif'` di kelas-kelas itu, **difilter berdasarkan paritas semester**: periode ganjil hanya menaikkan mahasiswa ber-`current_semester` ganjil, periode genap hanya yang genap.
+3. Mahasiswa yang `current_semester`-nya sudah mencapai `total_semesters` prodinya diubah statusnya menjadi `lulus`; `class_group_id` & `current_semester` dibiarkan di nilai terakhir sebagai histori.
+4. Mahasiswa lainnya naik `current_semester + 1`. Bila periode asal **genap**, mahasiswa juga dipindahkan ke `class_groups` baru dengan `year_level + 1`, `class_letter` sama, `class_code` digenerate ulang, di tahun ajaran berikutnya.
 5. Mahasiswa dengan `status = 'cuti'` **tidak** ikut dipindah otomatis — tetap di kelas lama sampai admin melakukan assignment manual saat mahasiswa tersebut aktif kembali.
 6. Mahasiswa dengan `status = 'DO'` tetap di kelas terakhir untuk keperluan histori, tidak ikut proses apapun.
+7. `enrollment_year` **tidak pernah** diubah oleh proses ini.
+
+**Idempotensi.** Filter paritas di langkah 2 adalah yang membuat proses aman dijalankan berulang. Transisi ganjil → genap tidak memindahkan kelas, jadi tanpa filter ini menjalankan promosi dua kali akan menaikkan semester +2. Karena keputusan diambil dari `current_semester` **tiap mahasiswa** (bukan `year_level` kelas), mahasiswa yang tertinggal setelah cuti juga tertangani dengan benar.
+
+**Pengaman:**
+- **Pratinjau (dry-run) wajib tersedia** — admin melihat tabel "kelas mana → kelas mana, semester berapa → berapa, berapa mahasiswa, hasilnya apa" sebelum mengeksekusi. Pratinjau bersifat read-only dan memakai rencana yang sama persis dengan eksekusi.
+- **Diblokir selama ada `evaluation_periods` berstatus `open`** — mahasiswa yang pindah kelas akan kehilangan akses ke evaluasi yang belum diisi padahal periodenya masih berjalan. Admin harus menutup periodenya dulu (CLI dapat menembus dengan `--force` untuk keperluan pemulihan).
 
 ### 6.2 Alur Kerja Admin (Rutin)
 
 1. **Setup awal** (jarang berubah): input `study_programs`, `courses` (kurikulum paket per prodi per semester).
-2. **Tiap tahun ajaran baru**: jalankan proses promosi kelas (6.1), buat `class_groups` untuk mahasiswa baru (tahun 1), buat akun mahasiswa baru.
+2. **Tiap akhir periode**: tutup periode evaluasi, lalu jalankan proses promosi semester (6.1). Khusus di pergantian genap → ganjil, ini sekaligus menaikkan kelas — di titik itu admin juga membuat `class_groups` untuk mahasiswa baru (tahun 1) dan akun mahasiswa baru beserta `enrollment_year`-nya.
 3. **Tiap periode/semester**: assign dosen ke `course_class_assignments` untuk kombinasi mata kuliah + kelas yang aktif pada periode tersebut — ini yang paling sering berubah. **[REVISI]** Admin dapat menambahkan **lebih dari satu dosen** untuk mata kuliah yang sama di kelas yang sama (team teaching) dengan cukup membuat baris tambahan di `course_class_assignments` dengan `lecturer_id` berbeda.
 4. **Kelola periode evaluasi**: buka (`status = 'open'`) dan tutup (`status = 'closed'`) periode evaluasi. **[REVISI v1.2]** Periode evaluasi bersifat **tunggal** — hanya boleh ada satu `evaluation_periods` berstatus `open` pada satu waktu. Saat admin membuka periode baru, sistem otomatis menutup (`status = 'closed'`) periode `open` yang masih berjalan.
 
@@ -359,7 +388,7 @@ Dashboard agregasi level prodi:
 2. Seeder: 5 `study_programs`, generate `class_groups` dummy (beberapa tahun ajaran), `courses` (kurikulum paket dummy per prodi), `evaluation_questions` template (5 kategori seperti contoh di bagian 5.3).
 3. Autentikasi + middleware role (admin/lecturer/student) + fitur `must_change_password`.
 4. Modul Admin: CRUD `study_programs`, `class_groups`, `courses`, akun `students` & `lecturers`, `course_class_assignments`, `evaluation_periods`, `evaluation_questions`.
-5. Fitur Service `ClassPromotionService` untuk proses naik tingkat kelas tahunan.
+5. Fitur Service `SemesterPromotionService` untuk proses naik semester per periode.
 6. Modul Mahasiswa: daftar evaluasi yang harus diisi (berdasarkan kelas + periode aktif), form kuesioner bintang + kesan & saran, validasi anti-submit-ganda.
 7. Modul Dosen: dashboard hasil evaluasi (skor rata-rata per kategori), daftar kesan & saran anonim dengan filter (kelas/periode/rentang rating) + penerapan minimum threshold responden.
 8. Modul Kaprodi: dashboard agregasi antar dosen dalam satu prodi, dibatasi ke `study_program_id` akun kaprodi.
@@ -369,7 +398,9 @@ Dashboard agregasi level prodi:
 
 ## 11. Glosarium
 
-- **Kohort**: kelompok mahasiswa yang masuk bersamaan dan naik tingkat bersama, direpresentasikan oleh `class_letter` yang konsisten dari tahun ke tahun.
+- **Kohort**: kelompok mahasiswa yang masuk bersamaan dan naik tingkat bersama, teridentifikasi oleh pasangan `enrollment_year` + `class_letter` yang konsisten dari tahun ke tahun. `class_letter` saja tidak cukup karena dipakai ulang oleh setiap angkatan.
+- **Angkatan (`enrollment_year`)**: tahun mahasiswa masuk kampus, mis. `2025`. Disimpan eksplisit dan tidak pernah berubah, sehingga tetap valid sebagai penanda kohort meski mahasiswa tertinggal karena cuti atau sudah lulus.
+- **Promosi semester**: proses menaikkan mahasiswa aktif satu semester di akhir tiap periode (bagian 6.1). Pada pergantian genap → ganjil, proses ini sekaligus menaikkan kelas.
 - **Paket kurikulum**: mata kuliah yang sudah ditetapkan jurusan per prodi per semester, tidak dipilih bebas oleh mahasiswa.
 - **Periode evaluasi**: rentang waktu (biasanya 1 semester) di mana mahasiswa dapat mengisi evaluasi dosen.
 - **Kesan & Saran**: fitur feedback teks bebas anonim, pengganti fitur analisis sentimen otomatis yang sempat direncanakan namun dihilangkan dari scope.
