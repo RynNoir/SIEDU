@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\SemesterType;
 use App\Services\SemesterPromotionService;
 use Illuminate\Console\Command;
 
@@ -11,35 +12,36 @@ class PromoteSemester extends Command
      * @var string
      */
     protected $signature = 'semester:promote
-                            {fromYear : Tahun ajaran asal (mis. 2025/2026)}
-                            {toYear : Tahun ajaran tujuan (mis. 2026/2027)}';
+                            {academicYear : Tahun ajaran periode asal (mis. 2025/2026)}
+                            {semesterType : Tipe semester periode asal: ganjil atau genap}';
 
     /**
      * @var string
      */
-    protected $description = 'Naikkan tingkat semua kelas dari satu tahun ajaran ke tahun berikutnya (PRD §6.1)';
+    protected $description = 'Naikkan mahasiswa satu semester dari periode berjalan (PRD §6.1)';
 
     public function handle(SemesterPromotionService $service): int
     {
-        $from = (string) $this->argument('fromYear');
-        $to = (string) $this->argument('toYear');
+        $academicYear = (string) $this->argument('academicYear');
+        $semesterType = SemesterType::tryFrom((string) $this->argument('semesterType'));
 
-        if ($from === $to) {
-            $this->error('Tahun asal dan tujuan tidak boleh sama.');
+        if (! $semesterType) {
+            $this->error('Tipe semester harus "ganjil" atau "genap".');
 
             return self::FAILURE;
         }
 
-        $this->info("Menjalankan promosi kelas: {$from} → {$to} ...");
+        $this->info("Menaikkan semester dari periode {$semesterType->value} {$academicYear} ...");
 
-        $summary = $service->promote($from, $to);
+        $summary = $service->promote($academicYear, $semesterType);
 
         $this->table(
-            ['Metrik', 'Jumlah'],
+            ['Metrik', 'Nilai'],
             [
-                ['Kelas dinaikkan', $summary['classes_promoted']],
-                ['Kelas lulus (tidak dinaikkan)', $summary['classes_graduated']],
-                ['Mahasiswa dipindahkan', $summary['students_promoted']],
+                ['Periode tujuan', $summary['to_semester_type']->value.' '.$summary['to_academic_year']],
+                ['Mahasiswa naik semester', $summary['students_promoted']],
+                ['Mahasiswa selesai semester akhir', $summary['students_graduated']],
+                ['Kelas baru dibuat', $summary['classes_created']],
             ],
         );
 

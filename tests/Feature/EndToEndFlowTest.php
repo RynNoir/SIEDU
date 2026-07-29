@@ -73,7 +73,7 @@ test('alur team teaching: 1 MK 2 dosen tampil sebagai 2 form', function () {
     expect(CourseClassAssignment::count())->toBe(2);
 });
 
-test('alur promosi kelas menaikkan mahasiswa aktif', function () {
+test('alur promosi semester menaikkan mahasiswa aktif satu semester per periode', function () {
     $prodi = StudyProgram::factory()->create(['code' => 'MI', 'total_semesters' => 6]);
     $class = ClassGroup::factory()->create([
         'study_program_id' => $prodi->id, 'academic_year' => '2025/2026',
@@ -83,7 +83,14 @@ test('alur promosi kelas menaikkan mahasiswa aktif', function () {
         'study_program_id' => $prodi->id, 'class_group_id' => $class->id, 'current_semester' => 1,
     ]);
 
-    $this->artisan('semester:promote', ['fromYear' => '2025/2026', 'toYear' => '2026/2027'])->assertSuccessful();
+    // Ganjil -> genap: naik semester, kelas tetap.
+    $this->artisan('semester:promote', ['academicYear' => '2025/2026', 'semesterType' => 'ganjil'])->assertSuccessful();
+    $student->refresh();
+    expect($student->current_semester)->toBe(2)
+        ->and($student->class_group_id)->toBe($class->id);
+
+    // Genap -> ganjil: naik semester sekaligus naik kelas di tahun ajaran baru.
+    $this->artisan('semester:promote', ['academicYear' => '2025/2026', 'semesterType' => 'genap'])->assertSuccessful();
 
     $newClass = ClassGroup::where('class_code', 'MI2A')->where('academic_year', '2026/2027')->firstOrFail();
     $student->refresh();
