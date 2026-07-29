@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('evaluation-periods/{evaluation_period}/close', [EvaluationPeriodController::class, 'close'])->name('evaluation-periods.close');
     Route::resource('course-class-assignments', CourseClassAssignmentController::class)->except('show');
     Route::get('semester-promotion', [SemesterPromotionController::class, 'index'])->name('semester-promotion.index');
+    Route::get('semester-promotion/preview', [SemesterPromotionController::class, 'preview'])->name('semester-promotion.preview');
     Route::post('semester-promotion', [SemesterPromotionController::class, 'run'])->name('semester-promotion.run');
 });
 

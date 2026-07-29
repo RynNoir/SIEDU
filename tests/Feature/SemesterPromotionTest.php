@@ -243,6 +243,55 @@ test('command semester:promote menolak tipe semester yang tidak dikenal', functi
         ->assertFailed();
 });
 
+test('pratinjau menampilkan rencana tanpa mengubah data apa pun', function () {
+    $admin = User::factory()->admin()->create();
+    $class = makeClass(yearLevel: 1);
+    $student = makeStudent($class, semester: 2);
+
+    $this->actingAs($admin)->get(route('admin.semester-promotion.preview', [
+        'academic_year' => '2025/2026', 'semester_type' => 'genap',
+    ]))->assertOk()
+        ->assertSee('MI1A')
+        ->assertSee('MI2A')      // kelas tujuan ditampilkan walau belum dibuat
+        ->assertSee('Naik kelas');
+
+    // Read-only: semester, kelas, dan kelas tujuan tidak boleh tersentuh.
+    expect($student->fresh()->current_semester)->toBe(2)
+        ->and($student->fresh()->class_group_id)->toBe($class->id)
+        ->and(ClassGroup::where('class_code', 'MI2A')->exists())->toBeFalse();
+});
+
+test('pratinjau memisahkan mahasiswa yang tertinggal jadi baris sendiri', function () {
+    $class = makeClass(yearLevel: 2);
+    makeStudent($class, semester: 1);  // tertinggal setelah cuti
+    makeStudent($class, semester: 3);
+    makeStudent($class, semester: 3);
+
+    $preview = app(SemesterPromotionService::class)->preview('2025/2026', SemesterType::Ganjil);
+
+    expect($preview['rows'])->toHaveCount(2)
+        ->and($preview['students_promoted'])->toBe(3);
+
+    expect($preview['rows'][0]['from_semester'])->toBe(1)
+        ->and($preview['rows'][0]['students'])->toBe(1)
+        ->and($preview['rows'][1]['from_semester'])->toBe(3)
+        ->and($preview['rows'][1]['students'])->toBe(2);
+});
+
+test('pratinjau cocok dengan hasil promosi sungguhan', function () {
+    $class = makeClass(yearLevel: 3, degree: 'D3', totalSemesters: 6);
+    makeStudent($class, semester: 6);   // lulus
+    makeStudent($class, semester: 4);   // naik kelas
+    $service = app(SemesterPromotionService::class);
+
+    $preview = $service->preview('2025/2026', SemesterType::Genap);
+    $summary = $service->promote('2025/2026', SemesterType::Genap);
+
+    expect($preview['students_promoted'])->toBe($summary['students_promoted'])
+        ->and($preview['students_graduated'])->toBe($summary['students_graduated'])
+        ->and($preview['to_academic_year'])->toBe($summary['to_academic_year']);
+});
+
 test('promosi diblokir lewat web selama masih ada periode evaluasi dibuka', function () {
     $admin = User::factory()->admin()->create();
     $class = makeClass(yearLevel: 1);
