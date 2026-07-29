@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ClassPromotionService;
+use App\Services\SemesterPromotionService;
 use Illuminate\Console\Command;
 
-class PromoteClasses extends Command
+class PromoteSemester extends Command
 {
     /**
      * @var string
      */
-    protected $signature = 'class:promote
+    protected $signature = 'semester:promote
                             {fromYear : Tahun ajaran asal (mis. 2025/2026)}
                             {toYear : Tahun ajaran tujuan (mis. 2026/2027)}';
 
@@ -19,7 +19,7 @@ class PromoteClasses extends Command
      */
     protected $description = 'Naikkan tingkat semua kelas dari satu tahun ajaran ke tahun berikutnya (PRD §6.1)';
 
-    public function handle(ClassPromotionService $service): int
+    public function handle(SemesterPromotionService $service): int
     {
         $from = (string) $this->argument('fromYear');
         $to = (string) $this->argument('toYear');

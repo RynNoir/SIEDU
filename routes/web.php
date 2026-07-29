@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\ClassGroupController;
-use App\Http\Controllers\Admin\ClassPromotionController;
 use App\Http\Controllers\Admin\CourseClassAssignmentController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EvaluationPeriodController;
 use App\Http\Controllers\Admin\EvaluationQuestionController;
 use App\Http\Controllers\Admin\LecturerController;
+use App\Http\Controllers\Admin\SemesterPromotionController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\StudyProgramController;
 use App\Http\Controllers\Auth\ChangePasswordController;
@@ -46,8 +46,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('evaluation-periods/{evaluation_period}/open', [EvaluationPeriodController::class, 'open'])->name('evaluation-periods.open');
     Route::post('evaluation-periods/{evaluation_period}/close', [EvaluationPeriodController::class, 'close'])->name('evaluation-periods.close');
     Route::resource('course-class-assignments', CourseClassAssignmentController::class)->except('show');
-    Route::get('class-promotion', [ClassPromotionController::class, 'index'])->name('class-promotion.index');
-    Route::post('class-promotion', [ClassPromotionController::class, 'run'])->name('class-promotion.run');
+    Route::get('semester-promotion', [SemesterPromotionController::class, 'index'])->name('semester-promotion.index');
+    Route::post('semester-promotion', [SemesterPromotionController::class, 'run'])->name('semester-promotion.run');
 });
 
 Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {

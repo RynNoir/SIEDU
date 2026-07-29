@@ -11,7 +11,7 @@
         ['route' => 'admin.evaluation-periods.index', 'label' => 'Periode Evaluasi', 'pattern' => 'admin.evaluation-periods.*', 'icon' => 'period'],
         ['route' => 'admin.evaluation-questions.index', 'label' => 'Pertanyaan', 'pattern' => 'admin.evaluation-questions.*', 'icon' => 'question'],
         ['route' => 'admin.course-class-assignments.index', 'label' => 'Penugasan Dosen', 'pattern' => 'admin.course-class-assignments.*', 'icon' => 'assignment'],
-        ['route' => 'admin.class-promotion.index', 'label' => 'Promosi Kelas', 'pattern' => 'admin.class-promotion.*', 'icon' => 'promotion'],
+        ['route' => 'admin.semester-promotion.index', 'label' => 'Promosi Semester', 'pattern' => 'admin.semester-promotion.*', 'icon' => 'promotion'],
     ];
 @endphp
 

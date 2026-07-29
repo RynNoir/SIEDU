@@ -4,7 +4,7 @@ use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
 use App\Models\Student;
 use App\Models\StudyProgram;
-use App\Services\ClassPromotionService;
+use App\Services\SemesterPromotionService;
 
 /**
  * Helper: buat prodi + 1 kelas di tahun asal.
@@ -33,7 +33,7 @@ test('mahasiswa aktif naik kelas dan semester bertambah 2', function () {
         'status' => StudentStatus::Aktif,
     ]);
 
-    app(ClassPromotionService::class)->promote('2025/2026', '2026/2027');
+    app(SemesterPromotionService::class)->promote('2025/2026', '2026/2027');
 
     $newClass = ClassGroup::where('academic_year', '2026/2027')->where('class_code', 'MI2A')->first();
     expect($newClass)->not->toBeNull()
@@ -53,7 +53,7 @@ test('mahasiswa cuti tidak ikut dipindah', function () {
         'status' => StudentStatus::Cuti,
     ]);
 
-    app(ClassPromotionService::class)->promote('2025/2026', '2026/2027');
+    app(SemesterPromotionService::class)->promote('2025/2026', '2026/2027');
 
     expect($student->fresh()->class_group_id)->toBe($class->id);
 });
@@ -67,7 +67,7 @@ test('mahasiswa DO tetap di kelas terakhir', function () {
         'status' => StudentStatus::DO,
     ]);
 
-    app(ClassPromotionService::class)->promote('2025/2026', '2026/2027');
+    app(SemesterPromotionService::class)->promote('2025/2026', '2026/2027');
 
     expect($student->fresh()->class_group_id)->toBe($class->id);
 });
@@ -81,7 +81,7 @@ test('kelas tahun akhir tidak dinaikkan (lulus)', function () {
         'status' => StudentStatus::Aktif,
     ]);
 
-    $summary = app(ClassPromotionService::class)->promote('2025/2026', '2026/2027');
+    $summary = app(SemesterPromotionService::class)->promote('2025/2026', '2026/2027');
 
     expect($summary['classes_graduated'])->toBe(1)
         ->and($summary['classes_promoted'])->toBe(0)
@@ -99,7 +99,7 @@ test('D4 boleh naik sampai tahun 4', function () {
         'status' => StudentStatus::Aktif,
     ]);
 
-    $summary = app(ClassPromotionService::class)->promote('2025/2026', '2026/2027');
+    $summary = app(SemesterPromotionService::class)->promote('2025/2026', '2026/2027');
 
     expect($summary['classes_promoted'])->toBe(1)
         ->and(ClassGroup::where('class_code', 'MI4A')->exists())->toBeTrue();
@@ -115,7 +115,7 @@ test('promosi idempotent bila dijalankan dua kali', function () {
         'status' => StudentStatus::Aktif,
     ]);
 
-    $service = app(ClassPromotionService::class);
+    $service = app(SemesterPromotionService::class);
     $service->promote('2025/2026', '2026/2027');
     $service->promote('2025/2026', '2026/2027');
 
@@ -124,7 +124,7 @@ test('promosi idempotent bila dijalankan dua kali', function () {
     expect($student->fresh()->current_semester)->toBe(3);
 });
 
-test('command class:promote berjalan dan memindahkan mahasiswa', function () {
+test('command semester:promote berjalan dan memindahkan mahasiswa', function () {
     $class = makeClass(yearLevel: 1);
     Student::factory()->create([
         'study_program_id' => $class->study_program_id,
@@ -133,7 +133,7 @@ test('command class:promote berjalan dan memindahkan mahasiswa', function () {
         'status' => StudentStatus::Aktif,
     ]);
 
-    $this->artisan('class:promote', ['fromYear' => '2025/2026', 'toYear' => '2026/2027'])
+    $this->artisan('semester:promote', ['fromYear' => '2025/2026', 'toYear' => '2026/2027'])
         ->assertSuccessful();
 
     expect(ClassGroup::where('academic_year', '2026/2027')->where('class_code', 'MI2A')->exists())->toBeTrue();

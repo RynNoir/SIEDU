@@ -83,7 +83,7 @@ test('alur promosi kelas menaikkan mahasiswa aktif', function () {
         'study_program_id' => $prodi->id, 'class_group_id' => $class->id, 'current_semester' => 1,
     ]);
 
-    $this->artisan('class:promote', ['fromYear' => '2025/2026', 'toYear' => '2026/2027'])->assertSuccessful();
+    $this->artisan('semester:promote', ['fromYear' => '2025/2026', 'toYear' => '2026/2027'])->assertSuccessful();
 
     $newClass = ClassGroup::where('class_code', 'MI2A')->where('academic_year', '2026/2027')->firstOrFail();
     $student->refresh();

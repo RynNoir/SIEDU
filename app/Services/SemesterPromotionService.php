@@ -6,7 +6,7 @@ use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
 use Illuminate\Support\Facades\DB;
 
-class ClassPromotionService
+class SemesterPromotionService
 {
     /**
      * Naikkan seluruh kelas dari satu tahun ajaran ke tahun berikutnya (PRD §6.1).

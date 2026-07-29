@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\ClassPromotionService;
+use App\Services\SemesterPromotionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class ClassPromotionController extends Controller
+class SemesterPromotionController extends Controller
 {
     public function index(): View
     {
-        return view('admin.class-promotion.index');
+        return view('admin.semester-promotion.index');
     }
 
-    public function run(Request $request, ClassPromotionService $service): RedirectResponse
+    public function run(Request $request, SemesterPromotionService $service): RedirectResponse
     {
         $validated = $request->validate([
             'from_year' => ['required', 'regex:/^\d{4}\/\d{4}$/'],

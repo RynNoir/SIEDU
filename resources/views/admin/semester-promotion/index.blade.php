@@ -1,4 +1,4 @@
-<x-admin-layout header="Promosi Kelas Tahunan">
+<x-admin-layout header="Promosi Semester">
     <x-card class="max-w-xl">
         <p class="text-sm text-muted">
             Menaikkan semua kelas dari tahun ajaran asal ke tahun berikutnya. Mahasiswa aktif naik tingkat
@@ -6,7 +6,7 @@
             Aman dijalankan berulang.
         </p>
 
-        <form method="POST" action="{{ route('admin.class-promotion.run') }}" class="mt-6 space-y-4"
+        <form method="POST" action="{{ route('admin.semester-promotion.run') }}" class="mt-6 space-y-4"
             onsubmit="return confirm('Jalankan promosi kelas? Tindakan ini memindahkan mahasiswa aktif ke tahun berikutnya.')">
             @csrf
 
