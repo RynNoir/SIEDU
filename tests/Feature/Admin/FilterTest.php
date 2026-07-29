@@ -55,6 +55,33 @@ test('filter mahasiswa: kombinasi kelas dan status', function () {
         ->assertOk()->assertSee('2401002')->assertDontSee('2401001');
 });
 
+test('filter mahasiswa: per tahun angkatan', function () {
+    $admin = User::factory()->admin()->create();
+    $prodi = StudyProgram::factory()->create();
+    $class = ClassGroup::factory()->create(['study_program_id' => $prodi->id, 'class_code' => 'MI1A']);
+
+    Student::factory()->create([
+        'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'nim' => '2301001', 'enrollment_year' => 2023,
+    ]);
+    Student::factory()->create([
+        'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'nim' => '2401001', 'enrollment_year' => 2024,
+    ]);
+
+    $this->actingAs($admin)->get(route('admin.students.index', ['enrollment_year' => 2023]))
+        ->assertOk()->assertSee('2301001')->assertDontSee('2401001');
+});
+
+test('tahun angkatan diturunkan dari tahun ajaran kelas dan semester berjalan', function () {
+    // Sem 1 di 2025/2026 -> angkatan 2025; sem 3 di 2026/2027 -> tetap angkatan 2025.
+    expect(Student::deriveEnrollmentYear('2025/2026', 1))->toBe(2025)
+        ->and(Student::deriveEnrollmentYear('2025/2026', 2))->toBe(2025)
+        ->and(Student::deriveEnrollmentYear('2026/2027', 3))->toBe(2025)
+        ->and(Student::deriveEnrollmentYear('2026/2027', 4))->toBe(2025)
+        ->and(Student::deriveEnrollmentYear('2027/2028', 5))->toBe(2025);
+});
+
 test('filter penugasan dosen: per mata kuliah, dosen, kelas, dan periode', function () {
     $admin = User::factory()->admin()->create();
     $prodi = StudyProgram::factory()->create();

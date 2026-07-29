@@ -18,11 +18,14 @@ class StudentSeeder extends Seeder
         $admin = User::where('role', Role::Admin)->firstOrFail();
 
         foreach (ClassGroup::all() as $class) {
+            $currentSemester = $class->year_level * 2 - 1;
+
             Student::factory()->count(25)->create([
                 'study_program_id' => $class->study_program_id,
                 'class_group_id' => $class->id,
                 // Semester ganjil: tahun 1 -> sem 1, tahun 2 -> sem 3 (PRD §7.1)
-                'current_semester' => $class->year_level * 2 - 1,
+                'current_semester' => $currentSemester,
+                'enrollment_year' => Student::deriveEnrollmentYear($class->academic_year, $currentSemester),
                 'created_by' => $admin->id,
             ]);
         }

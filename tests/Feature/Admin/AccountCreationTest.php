@@ -27,6 +27,7 @@ test('membuat mahasiswa menolak semester tak sesuai tahun kelas (§7.1)', functi
     $this->actingAs($admin)->post(route('admin.students.store'), [
         'name' => 'Ani', 'nim' => '2401001', 'email' => 'ani@siedu.test',
         'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'enrollment_year' => 2025,
         'current_semester' => 3, // tidak valid untuk tahun 1
         'status' => 'aktif',
     ])->assertSessionHasErrors('current_semester');
@@ -40,8 +41,11 @@ test('membuat mahasiswa set created_by ke admin', function () {
     $this->actingAs($admin)->post(route('admin.students.store'), [
         'name' => 'Ani', 'nim' => '2401002', 'email' => 'ani2@siedu.test',
         'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'enrollment_year' => 2025,
         'current_semester' => 1, 'status' => 'aktif',
     ])->assertRedirect(route('admin.students.index'));
 
-    $this->assertDatabaseHas('students', ['nim' => '2401002', 'created_by' => $admin->id]);
+    $this->assertDatabaseHas('students', [
+        'nim' => '2401002', 'created_by' => $admin->id, 'enrollment_year' => 2025,
+    ]);
 });

@@ -65,17 +65,26 @@
                 <x-input-error :messages="$errors->get('current_semester')" class="mt-1" />
             </div>
             <div>
-                <x-input-label for="status" :value="'Status'" />
-                <x-select id="status" name="status" class="mt-1" required>
-                    @foreach ($statuses as $status)
-                        <option value="{{ $status->value }}"
-                            @selected(old('status', ($student->status->value ?? 'aktif')) === $status->value)>
-                            {{ ucfirst($status->value) }}
-                        </option>
-                    @endforeach
-                </x-select>
-                <x-input-error :messages="$errors->get('status')" class="mt-1" />
+                <x-input-label for="enrollment_year" :value="'Angkatan'" />
+                <x-text-input id="enrollment_year" name="enrollment_year" type="number"
+                    min="2000" :max="now()->year + 1" class="mt-1 font-mono"
+                    :value="old('enrollment_year', $student->enrollment_year ?? now()->year)" required />
+                <x-input-error :messages="$errors->get('enrollment_year')" class="mt-1" />
+                <p class="mt-1 text-xs text-muted">Tahun masuk kampus. Tidak berubah saat naik semester atau lulus.</p>
             </div>
+        </div>
+
+        <div>
+            <x-input-label for="status" :value="'Status'" />
+            <x-select id="status" name="status" class="mt-1" required>
+                @foreach ($statuses as $status)
+                    <option value="{{ $status->value }}"
+                        @selected(old('status', ($student->status->value ?? 'aktif')) === $status->value)>
+                        {{ ucfirst($status->value) }}
+                    </option>
+                @endforeach
+            </x-select>
+            <x-input-error :messages="$errors->get('status')" class="mt-1" />
         </div>
 
         @unless ($editing)

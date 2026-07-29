@@ -31,6 +31,10 @@ class StudentRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('student')?->user_id)],
             'study_program_id' => ['required', Rule::exists('study_programs', 'id')],
             'class_group_id' => ['required', Rule::exists('class_groups', 'id')],
+            // Sengaja hanya divalidasi rentangnya, tidak dipaksa cocok dengan kelas:
+            // mahasiswa yang pernah cuti memang tertinggal dari kelasnya, dan justru
+            // kasus itulah yang membuat angkatan perlu disimpan terpisah.
+            'enrollment_year' => ['required', 'integer', 'between:2000,'.(now()->year + 1)],
             'current_semester' => ['required', 'integer', 'between:1,8'],
             'status' => ['required', Rule::enum(StudentStatus::class)],
         ];

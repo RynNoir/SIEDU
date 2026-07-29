@@ -17,6 +17,12 @@
                     <option value="{{ $class->id }}" @selected(request('class_group_id') == $class->id)>{{ $class->class_code }}</option>
                 @endforeach
             </x-select>
+            <x-select name="enrollment_year" onchange="this.form.requestSubmit()">
+                <option value="">Semua Angkatan</option>
+                @foreach ($enrollmentYears as $year)
+                    <option value="{{ $year }}" @selected(request('enrollment_year') == $year)>Angkatan {{ $year }}</option>
+                @endforeach
+            </x-select>
             <x-select name="status" onchange="this.form.requestSubmit()">
                 <option value="">Semua Status</option>
                 @foreach ($statuses as $status)
@@ -26,7 +32,7 @@
         </div>
         <div class="mt-2 flex items-center gap-2">
             <button type="submit" class="sr-only">Filter</button>
-            @if (request()->hasAny(['search', 'study_program_id', 'class_group_id', 'status']))
+            @if (request()->hasAny(['search', 'study_program_id', 'class_group_id', 'enrollment_year', 'status']))
                 <x-button variant="secondary" :href="route('admin.students.index')">Reset</x-button>
             @endif
         </div>
@@ -48,6 +54,7 @@
                     <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">NIM</th>
                     <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Nama</th>
                     <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kelas</th>
+                    <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Angkatan</th>
                     <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Sem</th>
                     <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Status</th>
                     <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted">Aksi</th>
@@ -58,6 +65,7 @@
                         <td class="px-4 py-3 font-mono text-ink">{{ $student->nim }}</td>
                         <td class="px-4 py-3 text-ink">{{ $student->name }}</td>
                         <td class="px-4 py-3 font-mono text-muted">{{ $student->classGroup->class_code }}</td>
+                        <td class="px-4 py-3 font-mono text-muted">{{ $student->enrollment_year }}</td>
                         <td class="px-4 py-3 text-muted">{{ $student->current_semester }}</td>
                         <td class="px-4 py-3"><x-badge-status :status="$student->status" /></td>
                         <td class="px-4 py-3">

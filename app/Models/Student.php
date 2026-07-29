@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'user_id', 'nim', 'name', 'study_program_id',
+    'user_id', 'nim', 'name', 'study_program_id', 'enrollment_year',
     'class_group_id', 'current_semester', 'status', 'created_by',
 ])]
 class Student extends Model
@@ -25,9 +25,22 @@ class Student extends Model
     protected function casts(): array
     {
         return [
+            'enrollment_year' => 'integer',
             'current_semester' => 'integer',
             'status' => StudentStatus::class,
         ];
+    }
+
+    /**
+     * Turunkan tahun angkatan dari kelas + semester yang sedang ditempuh.
+     *
+     * Hanya dipakai sebagai nilai default/backfill — begitu tersimpan, angkatan
+     * tidak pernah dihitung ulang (mahasiswa yang cuti akan tertinggal dari
+     * kelasnya, dan angkatan aslinya harus tetap utuh).
+     */
+    public static function deriveEnrollmentYear(string $academicYear, int $currentSemester): int
+    {
+        return (int) substr($academicYear, 0, 4) - ((int) ceil($currentSemester / 2) - 1);
     }
 
     /**

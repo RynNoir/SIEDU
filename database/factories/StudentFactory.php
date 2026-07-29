@@ -26,6 +26,12 @@ class StudentFactory extends Factory
             'study_program_id' => StudyProgram::factory(),
             'class_group_id' => ClassGroup::factory(),
             'current_semester' => fake()->numberBetween(1, 8),
+            // Angkatan diturunkan dari kelas yang di-assign, supaya tetap konsisten
+            // walau pemanggil menimpa class_group_id / current_semester.
+            'enrollment_year' => fn (array $attributes): int => Student::deriveEnrollmentYear(
+                ClassGroup::find($attributes['class_group_id'])?->academic_year ?? '2025/2026',
+                $attributes['current_semester'],
+            ),
             'status' => StudentStatus::Aktif,
             'created_by' => User::factory()->admin(),
         ];

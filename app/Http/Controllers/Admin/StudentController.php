@@ -29,6 +29,7 @@ class StudentController extends Controller
             })
             ->when($request->input('study_program_id'), fn ($q, $id) => $q->where('study_program_id', $id))
             ->when($request->input('class_group_id'), fn ($q, $id) => $q->where('class_group_id', $id))
+            ->when($request->input('enrollment_year'), fn ($q, $year) => $q->where('enrollment_year', $year))
             ->when($request->input('status'), fn ($q, $status) => $q->where('status', $status))
             ->orderBy('nim')
             ->paginate(20)
@@ -38,6 +39,7 @@ class StudentController extends Controller
             'students' => $students,
             'studyPrograms' => StudyProgram::orderBy('code')->get(),
             'classGroups' => ClassGroup::orderBy('class_code')->get(),
+            'enrollmentYears' => Student::query()->distinct()->orderByDesc('enrollment_year')->pluck('enrollment_year'),
             'statuses' => StudentStatus::cases(),
         ]);
     }
@@ -69,6 +71,7 @@ class StudentController extends Controller
                 'name' => $data['name'],
                 'study_program_id' => $data['study_program_id'],
                 'class_group_id' => $data['class_group_id'],
+                'enrollment_year' => $data['enrollment_year'],
                 'current_semester' => $data['current_semester'],
                 'status' => $data['status'],
                 'created_by' => auth()->id(),
@@ -98,6 +101,7 @@ class StudentController extends Controller
                 'name' => $data['name'],
                 'study_program_id' => $data['study_program_id'],
                 'class_group_id' => $data['class_group_id'],
+                'enrollment_year' => $data['enrollment_year'],
                 'current_semester' => $data['current_semester'],
                 'status' => $data['status'],
             ]);
