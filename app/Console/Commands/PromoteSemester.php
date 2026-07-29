@@ -40,7 +40,7 @@ class PromoteSemester extends Command
             [
                 ['Periode tujuan', $summary['to_semester_type']->value.' '.$summary['to_academic_year']],
                 ['Mahasiswa naik semester', $summary['students_promoted']],
-                ['Mahasiswa selesai semester akhir', $summary['students_graduated']],
+                ['Mahasiswa lulus', $summary['students_graduated']],
                 ['Kelas baru dibuat', $summary['classes_created']],
             ],
         );

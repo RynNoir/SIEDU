@@ -30,7 +30,7 @@ class SemesterPromotionController extends Controller
         $summary = $service->promote($validated['academic_year'], $semesterType);
 
         return back()->with('success', sprintf(
-            'Promosi %s %s → %s %s selesai: %d mahasiswa naik semester, %d selesai semester akhir, %d kelas baru dibuat.',
+            'Promosi %s %s → %s %s selesai: %d mahasiswa naik semester, %d lulus, %d kelas baru dibuat.',
             $semesterType->value, $validated['academic_year'],
             $summary['to_semester_type']->value, $summary['to_academic_year'],
             $summary['students_promoted'], $summary['students_graduated'], $summary['classes_created'],

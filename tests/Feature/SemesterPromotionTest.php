@@ -161,15 +161,44 @@ test('mahasiswa yang tertinggal setelah cuti mengikuti jadwal semesternya sendir
         ->and($normal->fresh()->current_semester)->toBe(4);
 });
 
-test('mahasiswa di semester terakhir tidak dinaikkan lagi', function () {
+test('mahasiswa di semester terakhir diluluskan, bukan dinaikkan', function () {
     $class = makeClass(yearLevel: 3, degree: 'D3', totalSemesters: 6);
     $student = makeStudent($class, semester: 6);
 
     $summary = app(SemesterPromotionService::class)->promote('2025/2026', SemesterType::Genap);
 
     expect($summary['students_graduated'])->toBe(1)
-        ->and($summary['students_promoted'])->toBe(0)
-        ->and($student->fresh()->current_semester)->toBe(6);
+        ->and($summary['students_promoted'])->toBe(0);
+
+    $student->refresh();
+    expect($student->status)->toBe(StudentStatus::Lulus)
+        // Kelas & semester terakhir dipertahankan sebagai histori.
+        ->and($student->current_semester)->toBe(6)
+        ->and($student->class_group_id)->toBe($class->id);
+});
+
+test('mahasiswa yang sudah lulus tidak ikut promosi berikutnya', function () {
+    $class = makeClass(yearLevel: 3, degree: 'D3', totalSemesters: 6);
+    $student = makeStudent($class, semester: 6);
+    $service = app(SemesterPromotionService::class);
+
+    $service->promote('2025/2026', SemesterType::Genap);
+    $summary = $service->promote('2025/2026', SemesterType::Genap);
+
+    expect($summary['students_graduated'])->toBe(0)
+        ->and($student->fresh()->status)->toBe(StudentStatus::Lulus);
+});
+
+test('kelulusan tidak menghapus tahun angkatan sebagai penanda kohort alumni', function () {
+    $class = makeClass(yearLevel: 3, degree: 'D3', totalSemesters: 6);
+    $student = makeStudent($class, semester: 6);
+    $angkatan = $student->enrollment_year;
+
+    app(SemesterPromotionService::class)->promote('2025/2026', SemesterType::Genap);
+
+    $student->refresh();
+    expect($student->status)->toBe(StudentStatus::Lulus)
+        ->and($student->enrollment_year)->toBe($angkatan);
 });
 
 test('D4 boleh naik sampai semester 8', function () {

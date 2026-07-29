@@ -46,8 +46,13 @@ class SemesterPromotionService
                 $totalSemesters = $class->studyProgram->total_semesters;
 
                 foreach ($this->promotableStudents($class, $semesterType) as $student) {
-                    // Sudah menuntaskan semester terakhir prodinya — tidak dinaikkan lagi.
+                    // Sudah menuntaskan semester terakhir prodinya -> lulus.
+                    // class_group_id & current_semester sengaja dibiarkan di nilai
+                    // terakhir sebagai histori; angkatan (enrollment_year) yang jadi
+                    // penanda kohort alumni. Status Lulus juga otomatis mengeluarkan
+                    // mahasiswa dari promosi berikutnya (hanya Aktif yang ikut).
                     if ($student->current_semester >= $totalSemesters) {
+                        $student->update(['status' => StudentStatus::Lulus]);
                         $summary['students_graduated']++;
 
                         continue;

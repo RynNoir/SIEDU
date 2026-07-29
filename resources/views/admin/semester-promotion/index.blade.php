@@ -4,6 +4,7 @@
             Menaikkan mahasiswa aktif <span class="font-medium text-ink">satu semester</span> dari periode yang dipilih.
             Dari <span class="font-medium text-ink">ganjil</span> mahasiswa naik ke semester genap dan tetap di kelas yang sama;
             dari <span class="font-medium text-ink">genap</span> mahasiswa naik kelas satu tingkat di tahun ajaran berikutnya.
+            Mahasiswa yang menuntaskan semester terakhir prodinya otomatis berstatus <span class="font-medium text-ink">Lulus</span>.
             Mahasiswa cuti &amp; DO tidak ikut. Aman dijalankan berulang.
         </p>
 
