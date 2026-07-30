@@ -22,7 +22,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-body bg-canvas text-ink antialiased">
+<body class="paper-grid font-body text-ink antialiased">
     {{--
         hx-boost: semua <a>/<form> di dalam sini otomatis jadi fetch AJAX (htmx),
         hanya #app-content yang ditukar -- sidebar & topbar tetap diam saat pindah menu
@@ -89,7 +89,8 @@
         <div id="app-content" class="relative flex min-w-0 flex-1 flex-col">
             <div class="htmx-indicator absolute inset-x-0 top-0 z-20 h-0.5 bg-accent"></div>
 
-            <header class="flex h-16 items-center justify-between bg-canvas px-4 lg:px-8 lg:pt-6">
+            {{-- Tanpa latar sendiri: biarkan grid kertas milimeter dari <body> tembus. --}}
+            <header class="flex h-16 items-center justify-between px-4 lg:px-8 lg:pt-6">
                 <div class="flex items-center gap-3">
                     <button @click="sidebarOpen = !sidebarOpen" class="text-muted hover:text-ink lg:hidden" aria-label="Buka menu">
                         <x-icon name="menu" class="size-6" />

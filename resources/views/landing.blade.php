@@ -27,7 +27,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="landing-page font-body text-ink antialiased">
+<body class="paper-grid font-body text-ink antialiased">
     <a href="#konten"
         class="sr-only rounded-input bg-accent px-4 py-2 text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50">
         Lewati ke konten
@@ -400,7 +400,7 @@
         {{-- ============================ CTA ============================ --}}
         <section class="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
             <div class="reveal relative mx-auto max-w-6xl overflow-hidden rounded-card bg-ink px-6 py-12 text-center shadow-xl sm:px-12 sm:py-16">
-                <div class="landing-grid-dark pointer-events-none absolute inset-0" aria-hidden="true"></div>
+                <div class="paper-grid-dark pointer-events-none absolute inset-0" aria-hidden="true"></div>
 
                 <div class="relative">
                     <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">

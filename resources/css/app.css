@@ -142,16 +142,17 @@
  */
 
 /*
- * Latar kertas milimeter untuk SELURUH halaman -- menegaskan konsep "pembacaan
- * instrumen" (§1) tanpa memakai accent sebagai dekorasi, yang dilarang §2.3.
+ * Latar kertas milimeter -- menegaskan konsep "pembacaan instrumen" (§1) tanpa
+ * memakai accent sebagai dekorasi, yang dilarang §2.3. Dipakai sebagai latar
+ * dasar SEMUA halaman: landing, auth, dan keempat shell peran.
  *
  * Latarnya sengaja diperdalam dari --color-canvas: canvas (#F5F7FA) dan surface
- * (#FFFFFF) hanya beda ~3% kecerahan, cukup di aplikasi yang padat data & punya
- * sidebar sebagai pembentuk struktur, tapi terbaca rata di halaman lapang
- * seperti ini. Warnanya diturunkan lewat color-mix dari token yang sudah ada
- * (canvas + sedikit ink), jadi tetap di dalam palet -- bukan warna baru.
+ * (#FFFFFF) hanya beda ~3% kecerahan, sehingga kartu nyaris tak terlihat
+ * "terangkat" dari latarnya. Warnanya diturunkan lewat color-mix dari token
+ * yang sudah ada (canvas + sedikit ink), jadi tetap di dalam palet -- bukan
+ * warna baru. Elemen foreground tetap memakai --color-surface seperti biasa.
  */
-.landing-page {
+.paper-grid {
     background-color: #e8eaee; /* fallback: hasil color-mix di bawah */
     background-color: color-mix(in srgb, var(--color-canvas) 94%, var(--color-ink) 6%);
     background-image:
@@ -160,9 +161,9 @@
     background-size: 56px 56px;
 }
 
-/* Grid versi terang untuk panel ber-latar ink (CTA), karena garis --color-border
+/* Grid versi terang untuk panel ber-latar ink, karena garis --color-border
    tidak terbaca di atas latar gelap. */
-.landing-grid-dark {
+.paper-grid-dark {
     background-image:
         linear-gradient(to right, rgb(255 255 255 / 0.12) 1px, transparent 1px),
         linear-gradient(to bottom, rgb(255 255 255 / 0.12) 1px, transparent 1px);

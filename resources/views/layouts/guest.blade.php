@@ -18,7 +18,7 @@
 </head>
 
 <body class="font-body text-ink antialiased">
-    <div class="flex min-h-screen items-center justify-center bg-canvas p-4">
+    <div class="paper-grid flex min-h-screen items-center justify-center p-4">
         {{-- Kartu split mengambang ala Elegent: shadow besar, radius besar, dua kolom (GUIDELINE §13.7) --}}
         <div class="grid w-full max-w-4xl overflow-hidden rounded-card bg-surface shadow-xl lg:grid-cols-2">
             {{-- Panel identitas --}}
