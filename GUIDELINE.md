@@ -426,3 +426,30 @@ Masalah yang diperbaiki: setiap klik menu sidebar atau submit filter memicu **ha
 
 1. **Sidebar tak sinkron setelah pindah menu**: status "aktif" nav dihitung server-side (`request()->routeIs()`), tapi karena nav berada di luar `#app-content` (sengaja, biar tak ikut flicker), nav tak pernah ikut ter-render ulang setelah navigasi boosted — status aktifnya jadi basi. **Solusi**: `<nav id="sidebar-nav" hx-swap-oob="true">` — htmx memindai *out-of-band swap* di **seluruh** respons (diverifikasi lewat source `htmx.js`: `findAndSwapOobElements` berjalan pada fragment penuh **sebelum** `hx-select` mempersempit), jadi nav ikut disinkronkan tanpa perlu masuk area `#app-content` dan tanpa nge-flicker sidebar (cuma isi `<nav>`, bukan seluruh `<aside>`, yang ditukar).
 2. **Filter di 4 halaman admin (Mata Kuliah/Dosen/Mahasiswa/Penugasan Dosen) masih menukar seluruh konten**, bukan cuma tabel: form filter defaultnya ikut config boost level-shell (`hx-target="#app-content"`), jadi judul halaman, KPI, dan form filter itu sendiri ikut ter-render ulang tiap kali filter berubah. **Solusi**: filter form (dan wrapper pagination-nya) diberi `hx-target="#results" hx-select="#results"` sendiri (htmx me-resolve config lewat *closest-ancestor lookup*, jadi override lokal ini menang atas default level-shell) — tabel+pagination dibungkus `<div id="results">`, dan hanya elemen itu yang ditukar saat filter berubah. Link **Edit**/form **Hapus** di setiap baris sengaja **tidak** diberi override ini (tetap pakai default `#app-content`) karena keduanya menuju halaman lain yang tak punya `#results`.
+---
+
+## 15. Landing Page Publik (halaman `/` untuk tamu)
+
+### 15.1 Kenapa aturan §1 & §8 dikecualikan di sini
+
+§1 menyatakan produk ini "bukan landing page pemasaran" dan §8 melarang animasi dekoratif. Keduanya ditulis untuk **aplikasi kerjanya** — permukaan yang dipakai berulang tiap hari, di mana animasi yang menawan pada kunjungan pertama berubah jadi hambatan pada kunjungan keseratus.
+
+Landing page adalah **permukaan yang berbeda**: dilihat sekali oleh orang yang belum punya konteks apa pun tentang sistem ini, dan tugasnya menjelaskan serta meyakinkan — bukan menjadi alat kerja. Karena itu ia punya anggaran motion sendiri. Yang **tidak** dikecualikan: palet, tipografi, dan konsep visualnya tetap terikat penuh pada §2, §3, dan §1.
+
+### 15.2 Konsep
+
+Hero-nya sengaja **bukan ilustrasi dekoratif**, melainkan potongan instrumen yang benar-benar berfungsi: pengunjung menekan gauge ⬥ yang sama persis dengan yang dipakai mahasiswa di form evaluasi, dan melihat pembacaan skor rata-ratanya bergerak. Ini menerjemahkan konsep inti §1 ("evaluasi sebagai pembacaan instrumen") jadi sesuatu yang bisa dirasakan dalam tiga detik pertama, sekaligus menghindari hero stok berisi ilustrasi orang tersenyum yang tak ada hubungannya dengan produk.
+
+Latar **kertas milimeter** (`.landing-grid`) memperkuat metafora spec-sheet. Dibuat dari `--color-border`, **bukan** `--color-accent` — §2.3 melarang accent dipakai sebagai dekorasi, dan aturan itu tetap berlaku di sini.
+
+### 15.3 Batas motion yang dipakai
+
+- **Reveal saat masuk viewport**: fade + rise 16px, 500ms `ease-out-quart`, sekali jalan (`unobserve` setelah tampil). Tanpa parallax, tanpa bounce, tanpa animasi berulang.
+- **Stagger antar kartu**: maksimal 100ms per item lewat `transition-delay` inline.
+- **Hover kartu**: `-translate-y-1` + naik satu tingkat shadow, 200ms — sama seperti interaksi di aplikasi.
+- **`prefers-reduced-motion`**: `.reveal` dinetralkan eksplisit di `app.css` (opacity 1, tanpa transform/transition), bukan hanya mengandalkan aturan global.
+- **Konten tidak bergantung JS**: kalau `IntersectionObserver` tak tersedia, semua elemen `.reveal` langsung ditampilkan.
+
+### 15.4 Yang tidak boleh ditampilkan
+
+Halaman ini publik — tidak ada autentikasi. Angka yang ditampilkan adalah **fakta produk** (jumlah peran, jumlah kategori penilaian, ambang minimum responden dari `config('evaluation.anonymity_min_respondents')`), **bukan** agregat data institusi (jumlah mahasiswa, dosen, atau prodi yang benar-benar terdaftar). Kalau suatu saat angka nyata ingin ditampilkan, itu keputusan tersendiri yang perlu persetujuan eksplisit, bukan sekadar penyesuaian tampilan.
