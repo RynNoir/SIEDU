@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
 use App\Models\Course;
 use App\Models\CourseClassAssignment;
@@ -53,6 +54,32 @@ test('filter mahasiswa: kombinasi kelas dan status', function () {
 
     $this->actingAs($admin)->get(route('admin.students.index', ['status' => 'cuti']))
         ->assertOk()->assertSee('2401002')->assertDontSee('2401001');
+});
+
+test('daftar mahasiswa tidak menampilkan alumni', function () {
+    $admin = User::factory()->admin()->create();
+    $prodi = StudyProgram::factory()->create();
+    $class = ClassGroup::factory()->create(['study_program_id' => $prodi->id, 'class_code' => 'MI3A']);
+
+    Student::factory()->create([
+        'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'nim' => '2201001', 'status' => StudentStatus::Lulus,
+    ]);
+    // Cuti & DO tetap tampil — admin masih perlu mengelolanya.
+    Student::factory()->create([
+        'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'nim' => '2401001', 'status' => StudentStatus::Cuti,
+    ]);
+    Student::factory()->create([
+        'study_program_id' => $prodi->id, 'class_group_id' => $class->id,
+        'nim' => '2401002', 'status' => StudentStatus::DO,
+    ]);
+
+    $this->actingAs($admin)->get(route('admin.students.index'))
+        ->assertOk()
+        ->assertDontSee('2201001')
+        ->assertSee('2401001')
+        ->assertSee('2401002');
 });
 
 test('filter mahasiswa: per tahun angkatan', function () {

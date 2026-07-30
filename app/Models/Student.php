@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\StudentStatus;
 use Database\Factories\StudentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +31,29 @@ class Student extends Model
             'current_semester' => 'integer',
             'status' => StudentStatus::class,
         ];
+    }
+
+    /**
+     * Mahasiswa yang masih terdaftar — semua kecuali yang sudah lulus.
+     *
+     * Cuti & DO tetap termasuk: admin masih perlu menemukan mahasiswa cuti untuk
+     * mengaktifkannya kembali, dan DO disimpan untuk histori. Yang dipisahkan
+     * hanya alumni, karena jumlahnya menumpuk tiap tahun dan kelas terakhirnya
+     * membuat daftar kelas di halaman mahasiswa jadi rancu.
+     */
+    #[Scope]
+    protected function enrolled(Builder $query): void
+    {
+        $query->where('status', '!=', StudentStatus::Lulus);
+    }
+
+    /**
+     * Alumni: mahasiswa yang sudah menuntaskan studinya.
+     */
+    #[Scope]
+    protected function alumni(Builder $query): void
+    {
+        $query->where('status', StudentStatus::Lulus);
     }
 
     /**

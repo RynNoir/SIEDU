@@ -10,6 +10,7 @@ use App\Models\ClassGroup;
 use App\Models\Student;
 use App\Models\StudyProgram;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,9 @@ class StudentController extends Controller
 {
     public function index(Request $request): View
     {
-        $students = Student::query()
+        // Alumni punya halamannya sendiri (admin.alumni.index) — dikeluarkan dari
+        // sini supaya daftar kelas & angkatan tidak terus menumpuk tiap tahun.
+        $students = Student::enrolled()
             ->with(['studyProgram', 'classGroup'])
             ->when($request->input('search'), function ($query, $search): void {
                 $query->where(function ($q) use ($search): void {
@@ -38,9 +41,13 @@ class StudentController extends Controller
         return view('admin.students.index', [
             'students' => $students,
             'studyPrograms' => StudyProgram::orderBy('code')->get(),
-            'classGroups' => ClassGroup::orderBy('class_code')->get(),
-            'enrollmentYears' => Student::query()->distinct()->orderByDesc('enrollment_year')->pluck('enrollment_year'),
-            'statuses' => StudentStatus::cases(),
+            // Dropdown filter dibatasi ke kelas/angkatan yang benar-benar masih
+            // punya mahasiswa di halaman ini — pilihan yang pasti nihil hasilnya
+            // hanya menambah kebingungan. (Form tambah/edit tetap pakai semua kelas.)
+            'classGroups' => ClassGroup::whereHas('students', fn (Builder $q) => $q->enrolled())
+                ->orderBy('class_code')->get(),
+            'enrollmentYears' => Student::enrolled()->distinct()->orderByDesc('enrollment_year')->pluck('enrollment_year'),
+            'statuses' => array_filter(StudentStatus::cases(), fn (StudentStatus $s) => $s !== StudentStatus::Lulus),
         ]);
     }
 
