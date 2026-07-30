@@ -8,6 +8,7 @@
         ['route' => 'admin.courses.index', 'label' => 'Mata Kuliah', 'pattern' => 'admin.courses.*', 'icon' => 'course'],
         ['route' => 'admin.lecturers.index', 'label' => 'Dosen', 'pattern' => 'admin.lecturers.*', 'icon' => 'lecturer'],
         ['route' => 'admin.students.index', 'label' => 'Mahasiswa', 'pattern' => 'admin.students.*', 'icon' => 'student'],
+        ['route' => 'admin.alumni.index', 'label' => 'Alumni', 'pattern' => 'admin.alumni.*', 'icon' => 'alumni'],
         ['route' => 'admin.evaluation-periods.index', 'label' => 'Periode Evaluasi', 'pattern' => 'admin.evaluation-periods.*', 'icon' => 'period'],
         ['route' => 'admin.evaluation-questions.index', 'label' => 'Pertanyaan', 'pattern' => 'admin.evaluation-questions.*', 'icon' => 'question'],
         ['route' => 'admin.course-class-assignments.index', 'label' => 'Penugasan Dosen', 'pattern' => 'admin.course-class-assignments.*', 'icon' => 'assignment'],

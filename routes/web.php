@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AlumniController;
 use App\Http\Controllers\Admin\ClassGroupController;
 use App\Http\Controllers\Admin\CourseClassAssignmentController;
 use App\Http\Controllers\Admin\CourseController;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('class-groups', ClassGroupController::class)->except('show');
     Route::resource('lecturers', LecturerController::class)->except('show');
     Route::resource('students', StudentController::class)->except('show');
+    Route::get('alumni', [AlumniController::class, 'index'])->name('alumni.index');
     Route::resource('evaluation-periods', EvaluationPeriodController::class)->except('show');
     Route::post('evaluation-periods/{evaluation_period}/open', [EvaluationPeriodController::class, 'open'])->name('evaluation-periods.open');
     Route::post('evaluation-periods/{evaluation_period}/close', [EvaluationPeriodController::class, 'close'])->name('evaluation-periods.close');
