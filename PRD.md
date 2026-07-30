@@ -66,7 +66,7 @@ Kelas adalah **kohort yang naik tingkat bersama** dari tahun ke tahun — bukan 
 **Penanganan kasus khusus:**
 - **Mahasiswa DO**: status diubah menjadi `DO`, tidak ikut proses promosi, `class_group_id` tetap menunjuk ke kelas terakhir aktif (untuk histori).
 - **Mahasiswa cuti**: status diubah menjadi `cuti`, tidak ikut promosi otomatis. Saat aktif kembali, admin melakukan **assignment manual** ke `class_group` dengan `class_letter` sama namun `year_level` yang sesuai dengan semester dia saat itu. Mahasiswa seperti ini akan **tertinggal dari kelasnya** (mis. semester 1 di kelas tahun 2); promosi menanganinya dengan benar karena keputusan diambil dari `current_semester` tiap mahasiswa, bukan dari `year_level` kelasnya.
-- **Mahasiswa lulus**: setelah menuntaskan semester terakhir prodinya, status otomatis menjadi `lulus`. `class_group_id` dan `current_semester` dibiarkan di nilai terakhir sebagai histori, dan `enrollment_year` menjadi penanda kohort alumninya.
+- **Mahasiswa lulus**: setelah menuntaskan semester terakhir prodinya, status otomatis menjadi `lulus`. `class_group_id` dan `current_semester` dibiarkan di nilai terakhir sebagai histori, dan `enrollment_year` menjadi penanda kohort alumninya. Alumni **dikeluarkan dari halaman Mahasiswa** dan ditampilkan di halaman **Alumni** tersendiri — kalau digabung, kelas terakhir tiap angkatan yang lulus akan terus menumpuk di daftar kelas halaman mahasiswa dan membuatnya rancu. Mahasiswa `cuti` dan `DO` **tetap** di halaman Mahasiswa karena admin masih perlu mengelolanya.
 
 ### 2.4 Kurikulum Paket (Fixed Curriculum)
 
@@ -387,7 +387,7 @@ Dashboard agregasi level prodi:
 1. Setup project Laravel + migration untuk 12 tabel di atas beserta foreign key & unique constraint.
 2. Seeder: 5 `study_programs`, generate `class_groups` dummy (beberapa tahun ajaran), `courses` (kurikulum paket dummy per prodi), `evaluation_questions` template (5 kategori seperti contoh di bagian 5.3).
 3. Autentikasi + middleware role (admin/lecturer/student) + fitur `must_change_password`.
-4. Modul Admin: CRUD `study_programs`, `class_groups`, `courses`, akun `students` & `lecturers`, `course_class_assignments`, `evaluation_periods`, `evaluation_questions`.
+4. Modul Admin: CRUD `study_programs`, `class_groups`, `courses`, akun `students` & `lecturers`, `course_class_assignments`, `evaluation_periods`, `evaluation_questions`, plus halaman **Alumni** (read-only).
 5. Fitur Service `SemesterPromotionService` untuk proses naik semester per periode.
 6. Modul Mahasiswa: daftar evaluasi yang harus diisi (berdasarkan kelas + periode aktif), form kuesioner bintang + kesan & saran, validasi anti-submit-ganda.
 7. Modul Dosen: dashboard hasil evaluasi (skor rata-rata per kategori), daftar kesan & saran anonim dengan filter (kelas/periode/rentang rating) + penerapan minimum threshold responden.
@@ -400,6 +400,7 @@ Dashboard agregasi level prodi:
 
 - **Kohort**: kelompok mahasiswa yang masuk bersamaan dan naik tingkat bersama, teridentifikasi oleh pasangan `enrollment_year` + `class_letter` yang konsisten dari tahun ke tahun. `class_letter` saja tidak cukup karena dipakai ulang oleh setiap angkatan.
 - **Angkatan (`enrollment_year`)**: tahun mahasiswa masuk kampus, mis. `2025`. Disimpan eksplisit dan tidak pernah berubah, sehingga tetap valid sebagai penanda kohort meski mahasiswa tertinggal karena cuti atau sudah lulus.
+- **Alumni**: mahasiswa berstatus `lulus`. Punya halaman sendiri di modul admin, terpisah dari halaman Mahasiswa; datanya read-only dan hanya bisa dikoreksi lewat form edit mahasiswa.
 - **Promosi semester**: proses menaikkan mahasiswa aktif satu semester di akhir tiap periode (bagian 6.1). Pada pergantian genap → ganjil, proses ini sekaligus menaikkan kelas.
 - **Paket kurikulum**: mata kuliah yang sudah ditetapkan jurusan per prodi per semester, tidak dipilih bebas oleh mahasiswa.
 - **Periode evaluasi**: rentang waktu (biasanya 1 semester) di mana mahasiswa dapat mengisi evaluasi dosen.
