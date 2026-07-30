@@ -41,7 +41,7 @@ Palet dan tipografi sengaja **menghindari tiga default umum desain AI**: bukan k
 - **Accent teal** hanya untuk elemen yang bisa diklik/interaktif (tombol, link, tab aktif, item nav aktif). Jangan pakai accent untuk dekorasi.
 - **Amber rating** khusus untuk komponen penilaian bintang/gauge. Tidak dipakai di tempat lain — begitu pengguna melihat warna ini, otomatis tahu itu terkait skor.
 - Warna status (success/warning/danger) hanya untuk **badge status** (aktif/cuti/DO) dan **notifikasi sistem** — jangan dipakai sebagai warna dekoratif section.
-- Latar `canvas` dipakai di seluruh halaman; `surface` (putih solid) hanya untuk elemen yang "diangkat" di atas canvas (kartu, tabel, modal).
+- Latar `canvas` dipakai di seluruh halaman; `surface` (putih solid) hanya untuk elemen yang "diangkat" di atas canvas (kartu, tabel, modal). **[Revisi v1.4 — lihat §16]** latar halaman kini memakai `canvas` yang diperdalam + grid kertas milimeter, karena selisih `canvas` vs `surface` yang cuma ~3% membuat elemen "terangkat" tidak terbaca terangkat. Peran `surface` tidak berubah.
 
 ---
 
@@ -453,3 +453,26 @@ Latar **kertas milimeter** (`.landing-grid`) memperkuat metafora spec-sheet. Dib
 ### 15.4 Yang tidak boleh ditampilkan
 
 Halaman ini publik — tidak ada autentikasi. Angka yang ditampilkan adalah **fakta produk** (jumlah peran, jumlah kategori penilaian, ambang minimum responden dari `config('evaluation.anonymity_min_respondents')`), **bukan** agregat data institusi (jumlah mahasiswa, dosen, atau prodi yang benar-benar terdaftar). Kalau suatu saat angka nyata ingin ditampilkan, itu keputusan tersendiri yang perlu persetujuan eksplisit, bukan sekadar penyesuaian tampilan.
+
+---
+
+## 16. [v1.4] Latar Kertas Milimeter (`.paper-grid`) — seluruh aplikasi
+
+### 16.1 Masalah yang diperbaiki
+
+`--color-canvas` (`#F5F7FA`) dan `--color-surface` (`#FFFFFF`) hanya berselisih **~3% kecerahan**. Di layout padat data hal ini tidak terasa karena sidebar dan garis tabel sudah membentuk struktur — tapi begitu ada ruang kosong yang lapang, kartu tidak terbaca "terangkat" sama sekali. Bahasa visual shadow-first §14 bertumpu pada kartu yang melayang di atas latar; kalau latarnya nyaris seputih kartunya, bayangan itu bekerja tanpa terlihat.
+
+### 16.2 Solusi
+
+Satu kelas `.paper-grid` dipasang di latar dasar **semua** permukaan: landing page, layout auth (`layouts/guest`), `app-shell` (admin/dosen/kaprodi), dan `student-layout`.
+
+- **Warna latar** diturunkan dengan `color-mix(in srgb, var(--color-canvas) 94%, var(--color-ink) 6%)` ≈ `#E8EAEE`. Diturunkan dari token yang sudah ada, **bukan warna baru** — palet §2.1 tidak bertambah. Disertai fallback hex untuk browser tanpa `color-mix` (build otomatis membungkusnya dalam `@supports`).
+- **Grid** 56×56px dari `--color-border`, menegaskan konsep "pembacaan instrumen/spec-sheet" §1. Sengaja **bukan** `--color-accent`: §2.3 melarang accent dipakai sebagai dekorasi, dan larangan itu tetap berlaku.
+- **`.paper-grid-dark`** — varian garis putih 12% untuk panel ber-latar `ink`, karena garis `--color-border` tidak terbaca di atas latar gelap.
+- Grid **ikut bergulir** bersama konten (bukan `background-attachment: fixed`), untuk menghindari masalah rendering yang dikenal di iOS Safari. Polanya menyambung tak terbatas sehingga tidak ada sambungan yang terlihat.
+
+### 16.3 Konsekuensi yang harus dijaga
+
+- Elemen yang menutupi seluruh lebar halaman **tidak boleh** punya latar solid sendiri kalau seharusnya grid tembus. Topbar `app-shell` sudah dilepas `bg-canvas`-nya karena kalau tidak, ada blok polos setinggi 64px yang memotong grid di tiap halaman admin. Periksa hal yang sama saat menambah header/section baru.
+- `bg-canvas` **tetap** dipakai untuk elemen di **dalam** kartu (header tabel sticky §6.3, state `disabled` input, lingkaran ikon empty state). Di sana perannya adalah tint lembut di atas putih, bukan latar halaman — dan itu tidak berubah.
+- Section yang sebelumnya berlatar putih selebar layar sebaiknya diubah jadi kartu, supaya grid tidak terpotong di tengah halaman.
