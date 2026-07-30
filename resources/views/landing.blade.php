@@ -27,7 +27,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-canvas font-body text-ink antialiased">
+<body class="landing-page font-body text-ink antialiased">
     <a href="#konten"
         class="sr-only rounded-input bg-accent px-4 py-2 text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50">
         Lewati ke konten
@@ -83,9 +83,7 @@
 
     <main id="konten">
         {{-- ============================ HERO ============================ --}}
-        <section class="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
-            <div class="landing-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
-
+        <section class="relative pt-28 pb-16 sm:pt-36 sm:pb-24">
             <div class="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
                 <div class="reveal">
                     <p class="font-mono text-xs uppercase tracking-widest text-accent">Sistem Evaluasi Dosen Terpadu</p>
@@ -125,7 +123,7 @@
                             return nilai.length ? nilai.reduce((a, b) => a + b, 0) / nilai.length : 0;
                         },
                     }">
-                    <div class="rounded-card bg-surface p-5 shadow-lg sm:p-6">
+                    <div class="rounded-card bg-surface p-5 shadow-xl sm:p-6">
                         <div class="flex items-center justify-between gap-3">
                             <div>
                                 <p class="text-xs font-semibold uppercase tracking-wide text-muted">Contoh Kuesioner</p>
@@ -186,20 +184,22 @@
         </section>
 
         {{-- ======================== ANGKA RINGKAS ======================== --}}
-        <section class="border-y border-border bg-surface">
-            <div class="mx-auto grid max-w-6xl grid-cols-2 gap-px bg-border sm:grid-cols-4">
-                @foreach ([
-                    ['4', 'peran pengguna', 'Mahasiswa, dosen, kaprodi, admin'],
-                    ['5', 'kategori penilaian', 'Dari penguasaan materi sampai feedback'],
-                    ['1–5', 'skala tiap butir', 'Gauge ⬥, bukan bintang'],
-                    [(string) config('evaluation.anonymity_min_respondents'), 'minimum responden', 'Sebelum kesan & saran ditampilkan'],
-                ] as $i => [$angka, $label, $keterangan])
-                    <div class="reveal bg-surface px-4 py-6 sm:px-6 sm:py-8" style="transition-delay: {{ $i * 80 }}ms">
-                        <p class="font-display text-3xl font-semibold text-ink sm:text-4xl">{{ $angka }}</p>
-                        <p class="mt-1 text-sm font-medium text-ink">{{ $label }}</p>
-                        <p class="mt-1 text-xs leading-relaxed text-muted">{{ $keterangan }}</p>
-                    </div>
-                @endforeach
+        <section class="px-4 sm:px-6 lg:px-8">
+            <div class="reveal mx-auto max-w-6xl overflow-hidden rounded-card bg-surface shadow-lg">
+                <div class="grid grid-cols-2 gap-px bg-border sm:grid-cols-4">
+                    @foreach ([
+                        ['4', 'peran pengguna', 'Mahasiswa, dosen, kaprodi, admin'],
+                        ['5', 'kategori penilaian', 'Dari penguasaan materi sampai feedback'],
+                        ['1–5', 'skala tiap butir', 'Gauge ⬥, bukan bintang'],
+                        [(string) config('evaluation.anonymity_min_respondents'), 'minimum responden', 'Sebelum kesan & saran ditampilkan'],
+                    ] as [$angka, $label, $keterangan])
+                        <div class="bg-surface px-4 py-6 sm:px-6 sm:py-8">
+                            <p class="font-display text-3xl font-semibold text-ink sm:text-4xl">{{ $angka }}</p>
+                            <p class="mt-1 text-sm font-medium text-ink">{{ $label }}</p>
+                            <p class="mt-1 text-xs leading-relaxed text-muted">{{ $keterangan }}</p>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </section>
 
@@ -223,7 +223,7 @@
                         ['02', 'results', 'Sistem mengagregasi', 'Jawaban dirata-rata per kategori penilaian, bukan ditumpuk jadi satu angka. Kesan & saran dipisahkan dari identitas pengirimnya.'],
                         ['03', 'lecturer', 'Dosen menindaklanjuti', 'Dosen melihat skor per kategori beserta kesan & saran anonim. Kaprodi melihat perbandingan antar dosen dalam prodinya.'],
                     ] as $i => [$nomor, $ikon, $judul, $isi])
-                        <div class="reveal group relative rounded-card bg-surface p-6 shadow-md transition duration-200 ease-out-quart hover:-translate-y-1 hover:shadow-lg"
+                        <div class="reveal group relative rounded-card bg-surface p-6 shadow-lg transition duration-200 ease-out-quart hover:-translate-y-1 hover:shadow-xl"
                             style="transition-delay: {{ $i * 100 }}ms">
                             <div class="flex items-center justify-between">
                                 <span class="flex size-11 items-center justify-center rounded-input bg-accent-soft text-accent">
@@ -240,7 +240,7 @@
         </section>
 
         {{-- =========================== PERAN =========================== --}}
-        <section id="peran" class="scroll-mt-20 border-y border-border bg-surface py-16 sm:py-24">
+        <section id="peran" class="scroll-mt-20 py-16 sm:py-24">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
                 x-data="{ aktif: 'mahasiswa' }">
                 <div class="reveal max-w-2xl">
@@ -285,7 +285,7 @@
                             :tabindex="aktif === '{{ $kunci }}' ? 0 : -1"
                             aria-controls="panel-{{ $kunci }}"
                             @click="aktif = '{{ $kunci }}'"
-                            :class="aktif === '{{ $kunci }}' ? 'bg-accent text-white shadow-md' : 'bg-canvas text-ink hover:bg-accent-soft'"
+                            :class="aktif === '{{ $kunci }}' ? 'bg-accent text-white shadow-md' : 'bg-surface text-ink shadow-sm hover:bg-accent-soft'"
                             class="flex items-center gap-2 rounded-input px-4 py-2.5 text-sm font-medium transition duration-150 ease-out-quart focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
                             <x-icon :name="$ikon" class="size-4" />
                             {{ $nama }}
@@ -299,9 +299,9 @@
                         x-transition:enter-start="opacity-0 translate-y-2"
                         x-transition:enter-end="opacity-100 translate-y-0"
                         id="panel-{{ $kunci }}" role="tabpanel" aria-labelledby="tab-{{ $kunci }}"
-                        class="mt-6 rounded-card bg-canvas p-6 sm:p-8">
+                        class="mt-6 rounded-card bg-surface p-6 shadow-lg sm:p-8">
                         <div class="flex items-start gap-4">
-                            <span class="flex size-12 shrink-0 items-center justify-center rounded-input bg-surface text-accent shadow-sm">
+                            <span class="flex size-12 shrink-0 items-center justify-center rounded-input bg-accent-soft text-accent">
                                 <x-icon :name="$ikon" class="size-6" />
                             </span>
                             <div class="min-w-0">
@@ -312,7 +312,7 @@
 
                         <ul class="mt-6 grid gap-3 sm:grid-cols-3">
                             @foreach ($poin as $butir)
-                                <li class="flex items-start gap-2.5 rounded-input bg-surface p-4 text-sm text-ink shadow-sm">
+                                <li class="flex items-start gap-2.5 rounded-input bg-canvas p-4 text-sm text-ink">
                                     <x-icon name="check-circle" class="mt-0.5 size-4 shrink-0 text-success" />
                                     <span class="leading-relaxed">{{ $butir }}</span>
                                 </li>
@@ -357,7 +357,7 @@
 
                 {{-- Ilustrasi: seperti inilah kesan & saran tampil di sisi dosen. --}}
                 <div class="reveal" style="transition-delay: 120ms">
-                    <div class="rounded-card bg-surface p-5 shadow-lg sm:p-6">
+                    <div class="rounded-card bg-surface p-5 shadow-xl sm:p-6">
                         <div class="mb-4 flex items-center justify-between gap-2">
                             <div>
                                 <h3 class="text-xs font-semibold uppercase tracking-wide text-muted">Kesan &amp; Saran</h3>
@@ -399,8 +399,8 @@
 
         {{-- ============================ CTA ============================ --}}
         <section class="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
-            <div class="reveal relative mx-auto max-w-6xl overflow-hidden rounded-card bg-ink px-6 py-12 text-center shadow-lg sm:px-12 sm:py-16">
-                <div class="landing-grid pointer-events-none absolute inset-0 opacity-10" aria-hidden="true"></div>
+            <div class="reveal relative mx-auto max-w-6xl overflow-hidden rounded-card bg-ink px-6 py-12 text-center shadow-xl sm:px-12 sm:py-16">
+                <div class="landing-grid-dark pointer-events-none absolute inset-0" aria-hidden="true"></div>
 
                 <div class="relative">
                     <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">

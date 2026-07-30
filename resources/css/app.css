@@ -141,16 +141,32 @@
  * atau bounce, dan seluruhnya mati saat prefers-reduced-motion aktif.
  */
 
-/* Latar kertas milimeter -- menegaskan konsep "pembacaan instrumen" (§1) tanpa
-   memakai accent sebagai dekorasi, yang dilarang §2.3. */
-.landing-grid {
+/*
+ * Latar kertas milimeter untuk SELURUH halaman -- menegaskan konsep "pembacaan
+ * instrumen" (§1) tanpa memakai accent sebagai dekorasi, yang dilarang §2.3.
+ *
+ * Latarnya sengaja diperdalam dari --color-canvas: canvas (#F5F7FA) dan surface
+ * (#FFFFFF) hanya beda ~3% kecerahan, cukup di aplikasi yang padat data & punya
+ * sidebar sebagai pembentuk struktur, tapi terbaca rata di halaman lapang
+ * seperti ini. Warnanya diturunkan lewat color-mix dari token yang sudah ada
+ * (canvas + sedikit ink), jadi tetap di dalam palet -- bukan warna baru.
+ */
+.landing-page {
+    background-color: #e8eaee; /* fallback: hasil color-mix di bawah */
+    background-color: color-mix(in srgb, var(--color-canvas) 94%, var(--color-ink) 6%);
     background-image:
         linear-gradient(to right, var(--color-border) 1px, transparent 1px),
         linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
     background-size: 56px 56px;
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 75%);
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 75%);
-    opacity: 0.7;
+}
+
+/* Grid versi terang untuk panel ber-latar ink (CTA), karena garis --color-border
+   tidak terbaca di atas latar gelap. */
+.landing-grid-dark {
+    background-image:
+        linear-gradient(to right, rgb(255 255 255 / 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / 0.12) 1px, transparent 1px);
+    background-size: 56px 56px;
 }
 
 /* Reveal saat masuk viewport (dipasang app.js lewat IntersectionObserver). */
