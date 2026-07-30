@@ -18,11 +18,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Student\EvaluationController;
 use Illuminate\Support\Facades\Route;
 
+// Tamu melihat landing page; yang sudah masuk langsung dilempar ke dashboardnya
+// masing-masing supaya tidak perlu melewati halaman promosi tiap membuka root.
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route(auth()->user()->dashboardRoute())
-        : redirect()->route('login');
-});
+        : view('landing');
+})->name('landing');
 
 Route::get('/dashboard', function () {
     return redirect()->route(auth()->user()->dashboardRoute());

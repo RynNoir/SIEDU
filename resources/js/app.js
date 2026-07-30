@@ -101,3 +101,38 @@ document.addEventListener('DOMContentLoaded', syncNavActiveState);
 document.body.addEventListener('htmx:afterSettle', syncNavActiveState);
 document.body.addEventListener('htmx:pushedIntoHistory', syncNavActiveState);
 window.addEventListener('popstate', syncNavActiveState);
+
+/**
+ * Reveal elemen landing page saat masuk viewport (fade + rise, lihat app.css).
+ * Hanya berjalan kalau ada elemen .reveal, jadi halaman aplikasi tidak terbebani.
+ * Kalau IntersectionObserver tak tersedia, semua langsung ditampilkan -- konten
+ * tidak boleh bergantung pada JS untuk bisa dibaca.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const targets = document.querySelectorAll('.reveal');
+    if (targets.length === 0) {
+        return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('reveal-in'));
+
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+                entry.target.classList.add('reveal-in');
+                observer.unobserve(entry.target);
+            });
+        },
+        { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+    );
+
+    targets.forEach((el) => observer.observe(el));
+});
