@@ -50,6 +50,15 @@ class ClassGroupController extends Controller
 
     public function destroy(ClassGroup $classGroup): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($classGroup, 'Kelas', [
+            'students' => 'mahasiswa',
+            'courseClassAssignments' => 'penugasan dosen',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         $classGroup->delete();
 
         return redirect()->route('admin.class-groups.index')->with('success', 'Kelas dihapus.');

@@ -96,6 +96,14 @@ class LecturerController extends Controller
 
     public function destroy(Lecturer $lecturer): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($lecturer, 'Dosen', [
+            'courseClassAssignments' => 'penugasan mengajar',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         DB::transaction(function () use ($lecturer): void {
             $user = $lecturer->user;
             $lecturer->delete();

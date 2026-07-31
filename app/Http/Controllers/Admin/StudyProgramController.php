@@ -52,6 +52,17 @@ class StudyProgramController extends Controller
 
     public function destroy(StudyProgram $studyProgram): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($studyProgram, 'Program studi', [
+            'courses' => 'mata kuliah',
+            'classGroups' => 'kelas',
+            'lecturers' => 'dosen',
+            'students' => 'mahasiswa',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         $studyProgram->delete();
 
         return redirect()->route('admin.study-programs.index')

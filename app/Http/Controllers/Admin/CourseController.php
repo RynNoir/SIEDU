@@ -64,6 +64,14 @@ class CourseController extends Controller
 
     public function destroy(Course $course): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($course, 'Mata kuliah', [
+            'courseClassAssignments' => 'penugasan dosen',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         $course->delete();
 
         return redirect()->route('admin.courses.index')->with('success', 'Mata kuliah dihapus.');
