@@ -43,6 +43,16 @@ class EvaluationQuestionController extends Controller
 
     public function destroy(EvaluationQuestion $evaluationQuestion): RedirectResponse
     {
+        // Menghapus pertanyaan yang sudah dijawab akan melubangi skor periode lampau.
+        // Nonaktifkan saja (is_active = false) supaya tidak muncul di kuesioner baru.
+        $blocked = $this->blockedByRelations($evaluationQuestion, 'Pertanyaan', [
+            'answers' => 'jawaban',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked.' Nonaktifkan pertanyaan ini bila tidak dipakai lagi.');
+        }
+
         $evaluationQuestion->delete();
 
         return redirect()->route('admin.evaluation-questions.index')->with('success', 'Pertanyaan dihapus.');

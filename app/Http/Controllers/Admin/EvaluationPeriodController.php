@@ -45,6 +45,15 @@ class EvaluationPeriodController extends Controller
 
     public function destroy(EvaluationPeriod $evaluationPeriod): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($evaluationPeriod, 'Periode evaluasi', [
+            'courseClassAssignments' => 'penugasan dosen',
+            'evaluations' => 'evaluasi terkirim',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         $evaluationPeriod->delete();
 
         return redirect()->route('admin.evaluation-periods.index')->with('success', 'Periode dihapus.');

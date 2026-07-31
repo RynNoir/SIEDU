@@ -62,6 +62,14 @@ class CourseClassAssignmentController extends Controller
 
     public function destroy(CourseClassAssignment $courseClassAssignment): RedirectResponse
     {
+        $blocked = $this->blockedByRelations($courseClassAssignment, 'Penugasan', [
+            'evaluations' => 'evaluasi terkirim',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked);
+        }
+
         $courseClassAssignment->delete();
 
         return redirect()->route('admin.course-class-assignments.index')->with('success', 'Penugasan dihapus.');

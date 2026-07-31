@@ -124,6 +124,17 @@ class StudentController extends Controller
 
     public function destroy(Student $student): RedirectResponse
     {
+        // Mahasiswa yang sudah mengisi evaluasi tidak dihapus: jawabannya sudah
+        // menyatu ke agregat skor dosen. Untuk yang berhenti, ubah statusnya jadi
+        // DO/lulus — memang untuk itu status tersebut ada (PRD §2.3).
+        $blocked = $this->blockedByRelations($student, 'Mahasiswa', [
+            'evaluations' => 'evaluasi terkirim',
+        ]);
+
+        if ($blocked) {
+            return back()->with('error', $blocked.' Ubah statusnya jadi DO atau lulus bila sudah tidak aktif.');
+        }
+
         DB::transaction(function () use ($student): void {
             $user = $student->user;
             $student->delete();
