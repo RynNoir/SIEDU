@@ -337,6 +337,7 @@ Contoh satu siklus penuh D3 (6 semester) untuk kohort `MI...A`:
    - Per periode (bandingkan semester ini vs sebelumnya)
    - Per rentang rating (misal hanya tampilkan dari mahasiswa yang beri rating rendah)
 4. **`student_id` tidak pernah ditampilkan atau dapat diakses lewat endpoint dosen.**
+5. **[v1.5]** Mengunduh hasil sebagai CSV — rekap seluruh kelas yang diampu (mengikuti filter aktif) atau detail satu penugasan. Lihat §6.6.
 
 ### 6.5 Alur Kerja Kaprodi **[REVISI v1.2 — Role Wajib, Bukan Opsional]**
 
@@ -346,6 +347,27 @@ Dashboard agregasi level prodi:
 - Filter per dosen, per periode (filter "per prodi" tidak diperlukan lagi karena sudah otomatis terbatas ke prodi sendiri).
 - Bandingkan skor antar dosen yang mengampu mata kuliah sama di kelas paralel berbeda (adil karena kurikulum identik/paket).
 - Tetap tunduk pada aturan anonimitas & threshold minimum responden (§7.5) dan larangan filter granular (§7.6) — kaprodi **tidak** dapat melihat `student_id` maupun kesan & saran individual di bawah threshold.
+- **[v1.5]** Mengunduh rekap prodi sebagai CSV untuk keperluan laporan ke jurusan. Lihat §6.6.
+
+### 6.6 Ekspor Laporan (CSV) **[v1.5]**
+
+Dosen dan kaprodi dapat mengunduh hasil evaluasi. Sebelumnya hasil hanya bisa dibaca di layar, sehingga kaprodi tidak punya cara menyusun laporan ke jurusan selain screenshot.
+
+Dua bentuk:
+
+| Bentuk | Isi | Cakupan |
+|---|---|---|
+| **Rekap** | Satu baris per penugasan: periode, tahun ajaran, semester, kode & nama MK, kelas, dosen, responden, ukuran kelas, partisipasi (%), rata-rata skor | Dosen: kelas yang diampu. Kaprodi: seluruh prodinya |
+| **Detail** | Identitas penugasan, skor per kategori, lalu kesan & saran anonim | Satu penugasan |
+
+**Aturan yang tetap berlaku di file unduhan** — ekspor bukan jalan pintas untuk menembus pembatasan:
+
+- Kesan & saran hanya ikut bila responden sudah mencapai ambang minimum (§7.5). Di bawah ambang, file hanya memuat keterangan bahwa datanya ditahan.
+- Tidak ada `student_id`, NIM, maupun nama mahasiswa di bentuk mana pun.
+- Cakupan akses sama persis dengan tampilan layar: kaprodi terkunci ke prodinya, dosen ke penugasannya sendiri.
+- File mengikuti filter yang sedang aktif di dashboard, sehingga isinya selalu sama dengan yang dilihat pengguna saat menekan unduh.
+
+Format CSV dipilih karena tidak menambah dependency dan langsung terbaca Excel. Berkasnya memakai BOM UTF-8, pemisah titik koma, dan desimal koma agar terbuka benar di Excel berlokal Indonesia tanpa wizard impor.
 
 ---
 
