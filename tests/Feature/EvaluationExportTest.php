@@ -170,6 +170,28 @@ test('mahasiswa tidak punya akses ke endpoint ekspor', function () {
         ->get(route('lecturer.assignments.export', $assignment))->assertForbidden();
 });
 
+test('tombol unduh muncul di dashboard dan halaman detail', function () {
+    ['assignment' => $assignment] = seedEvaluated(respondents: 5);
+
+    $this->actingAs($assignment->lecturer->user)->get(route('lecturer.dashboard'))
+        ->assertOk()->assertSee(route('lecturer.dashboard.export'), escape: false);
+
+    $this->actingAs($assignment->lecturer->user)->get(route('lecturer.assignments.show', $assignment))
+        ->assertOk()->assertSee(route('lecturer.assignments.export', $assignment), escape: false);
+});
+
+test('tautan unduh di dashboard membawa filter yang sedang aktif', function () {
+    ['assignment' => $assignment] = seedEvaluated(respondents: 2);
+
+    $this->actingAs($assignment->lecturer->user)
+        ->get(route('lecturer.dashboard', ['period_id' => $assignment->evaluation_period_id]))
+        ->assertOk()
+        ->assertSee(
+            route('lecturer.dashboard.export', ['period_id' => $assignment->evaluation_period_id]),
+            escape: false,
+        );
+});
+
 test('CSV diawali BOM UTF-8 dan memakai pemisah titik koma', function () {
     ['assignment' => $assignment] = seedEvaluated(respondents: 2);
 

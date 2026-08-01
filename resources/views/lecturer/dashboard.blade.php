@@ -27,8 +27,12 @@
                 @endforeach
             </x-select>
         </div>
-        <div class="mt-2 flex items-center gap-2">
+        <div class="mt-2 flex flex-wrap items-center gap-2">
             <button type="submit" class="sr-only">Filter</button>
+            {{-- hx-boost="false": unduhan harus jadi navigasi biasa, kalau di-boost
+                 htmx akan menyuntikkan isi CSV ke DOM alih-alih mengunduhnya. --}}
+            <x-button variant="secondary" hx-boost="false"
+                :href="route('lecturer.dashboard.export', request()->query())">Unduh CSV</x-button>
             @if (request()->hasAny(['course_id', 'class_group_id', 'period_id']))
                 <x-button variant="secondary" :href="route('lecturer.dashboard')">Reset</x-button>
             @endif
