@@ -57,7 +57,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:lecturer'])->prefix('lecturer')->name('lecturer.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
     Route::get('assignments/{assignment}', [DashboardController::class, 'show'])->name('assignments.show');
+    Route::get('assignments/{assignment}/export', [DashboardController::class, 'exportAssignment'])->name('assignments.export');
 });
 
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
@@ -69,7 +71,9 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 
 Route::middleware(['auth', 'role:kaprodi'])->prefix('kaprodi')->name('kaprodi.')->group(function () {
     Route::get('/dashboard', [KaprodiDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export', [KaprodiDashboardController::class, 'export'])->name('dashboard.export');
     Route::get('assignments/{assignment}', [KaprodiDashboardController::class, 'show'])->name('assignments.show');
+    Route::get('assignments/{assignment}/export', [KaprodiDashboardController::class, 'exportAssignment'])->name('assignments.export');
 });
 
 require __DIR__.'/auth.php';

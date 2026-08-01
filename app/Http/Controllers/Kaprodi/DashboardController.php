@@ -8,25 +8,20 @@ use App\Models\EvaluationAnswer;
 use App\Models\EvaluationPeriod;
 use App\Models\Lecturer;
 use App\Services\AssignmentResultService;
+use App\Services\CsvExportService;
+use App\Services\EvaluationExportService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
         $prodiId = auth()->user()->study_program_id;
-        $lecturerId = $request->input('lecturer_id');
-        $periodId = $request->input('period_id');
-
-        $assignments = CourseClassAssignment::query()
-            ->with(['course', 'lecturer', 'classGroup', 'evaluationPeriod'])
-            ->whereRelation('classGroup', 'study_program_id', $prodiId)
-            ->when($lecturerId, fn ($q, $id) => $q->where('lecturer_id', $id))
-            ->when($periodId, fn ($q, $id) => $q->where('evaluation_period_id', $id))
-            ->withCount('evaluations')
-            ->get();
+        $assignments = $this->filteredAssignments($request);
 
         // Rata-rata per assignment dalam satu query (cegah N+1).
         $avgById = EvaluationAnswer::query()
@@ -41,9 +36,22 @@ class DashboardController extends Controller
             'avgById' => $avgById,
             'lecturers' => Lecturer::where('study_program_id', $prodiId)->orderBy('name')->get(),
             'periods' => EvaluationPeriod::orderByDesc('start_date')->get(),
-            'lecturerId' => $lecturerId,
-            'periodId' => $periodId,
+            'lecturerId' => $request->input('lecturer_id'),
+            'periodId' => $request->input('period_id'),
         ]);
+    }
+
+    /**
+     * Unduh rekap sesuai filter yang sedang aktif di dashboard.
+     */
+    public function export(Request $request, EvaluationExportService $export, CsvExportService $csv): StreamedResponse
+    {
+        $rows = $export->recapRows($this->filteredAssignments($request));
+
+        return $csv->download(
+            $csv->filename('rekap-evaluasi', auth()->user()->studyProgram?->code),
+            $rows,
+        );
     }
 
     public function show(Request $request, CourseClassAssignment $assignment, AssignmentResultService $results): View
@@ -57,5 +65,40 @@ class DashboardController extends Controller
             'ratingFilter' => $request->input('rating'),
             ...$results->for($assignment, $request->input('rating')),
         ]);
+    }
+
+    /**
+     * Unduh detail satu penugasan: skor per kategori + kesan & saran anonim.
+     */
+    public function exportAssignment(CourseClassAssignment $assignment, EvaluationExportService $export, CsvExportService $csv): StreamedResponse
+    {
+        Gate::authorize('view', $assignment);
+
+        $assignment->load(['course', 'lecturer', 'classGroup', 'evaluationPeriod']);
+
+        return $csv->download(
+            $csv->filename('hasil-evaluasi', $assignment->course->code.'-'.$assignment->classGroup->class_code),
+            $export->detailRows($assignment),
+        );
+    }
+
+    /**
+     * Dipakai bersama tampilan & ekspor supaya filter keduanya tidak bisa berbeda.
+     * Dibatasi ke prodi kaprodi yang sedang masuk (PRD §6.4).
+     *
+     * @return Collection<int, CourseClassAssignment>
+     */
+    private function filteredAssignments(Request $request): Collection
+    {
+        return CourseClassAssignment::query()
+            ->with([
+                'course', 'lecturer', 'evaluationPeriod',
+                'classGroup' => fn ($q) => $q->withCount('students'),
+            ])
+            ->whereRelation('classGroup', 'study_program_id', auth()->user()->study_program_id)
+            ->when($request->input('lecturer_id'), fn ($q, $id) => $q->where('lecturer_id', $id))
+            ->when($request->input('period_id'), fn ($q, $id) => $q->where('evaluation_period_id', $id))
+            ->withCount('evaluations')
+            ->get();
     }
 }
