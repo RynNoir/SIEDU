@@ -41,9 +41,12 @@
     <div id="results" class="relative">
         <div class="htmx-indicator absolute inset-x-0 top-0 z-10 h-0.5 bg-accent"></div>
 
-        <div class="mb-4 flex items-center justify-between">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
             <p class="text-sm text-muted">{{ $students->total() }} mahasiswa</p>
-            <x-button :href="route('admin.students.create')">Tambah Mahasiswa</x-button>
+            <div class="flex flex-wrap items-center gap-2">
+                <x-button variant="secondary" :href="route('admin.students.import.index')">Impor CSV</x-button>
+                <x-button :href="route('admin.students.create')">Tambah Mahasiswa</x-button>
+            </div>
         </div>
 
         @if ($students->isEmpty())

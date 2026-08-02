@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\StudyProgram;
 use App\Models\User;
 use App\Services\StudentImportService;
+use Illuminate\Http\UploadedFile;
 
 const HEADER = "nim;nama;email;kode_prodi;kode_kelas;angkatan;semester;status\n";
 
@@ -179,4 +180,81 @@ test('status kosong dianggap aktif', function () {
     $this->service->import($this->path, $this->admin->id);
 
     expect(Student::where('nim', '2401001')->firstOrFail()->status)->toBe(StudentStatus::Aktif);
+});
+
+// ---------------------------------------------------------------------------
+// Alur HTTP: unggah -> pratinjau -> konfirmasi
+// ---------------------------------------------------------------------------
+
+/**
+ * Berkas unggahan palsu berisi header + body yang diberikan.
+ */
+function uploadedCsv(string $body): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent('mahasiswa.csv', HEADER.$body);
+}
+
+test('halaman impor bisa dibuka admin dan tidak oleh peran lain', function () {
+    $this->actingAs($this->admin)->get(route('admin.students.import.index'))
+        ->assertOk()->assertSee('Unduh Template');
+
+    $mahasiswa = Student::factory()->create(['class_group_id' => $this->kelas->id]);
+    $this->actingAs($mahasiswa->user)->get(route('admin.students.import.index'))->assertForbidden();
+});
+
+test('template berisi baris judul kolom yang diharapkan', function () {
+    $response = $this->actingAs($this->admin)->get(route('admin.students.import.template'));
+    $response->assertOk();
+
+    expect($response->streamedContent())->toContain('nim;nama;email;kode_prodi');
+});
+
+test('pratinjau lewat unggahan menampilkan baris valid & bermasalah', function () {
+    $response = $this->actingAs($this->admin)->post(route('admin.students.import.preview'), [
+        'file' => uploadedCsv(
+            "2401001;Budi;budi@kampus.test;MI;MI1A;2024;1;aktif\n".
+            "2401002;Citra;citra@kampus.test;MI;MI9Z;2024;1;aktif\n"
+        ),
+    ]);
+
+    $response->assertOk()->assertSee('1 siap diimpor')->assertSee('1 bermasalah')
+        ->assertSee('Kode kelas &quot;MI9Z&quot; tidak ditemukan', escape: false);
+
+    // Pratinjau tidak boleh menyimpan apa pun.
+    expect(Student::where('nim', '2401001')->exists())->toBeFalse();
+});
+
+test('konfirmasi menyimpan baris valid lalu mengarahkan ke daftar mahasiswa', function () {
+    $this->actingAs($this->admin)->post(route('admin.students.import.preview'), [
+        'file' => uploadedCsv("2401001;Budi;budi@kampus.test;MI;MI1A;2024;1;aktif\n"),
+    ])->assertOk();
+
+    $this->actingAs($this->admin)->post(route('admin.students.import.store'))
+        ->assertRedirect(route('admin.students.index'))
+        ->assertSessionHas('success');
+
+    expect(Student::where('nim', '2401001')->exists())->toBeTrue();
+});
+
+test('konfirmasi tanpa pratinjau ditolak dengan pesan yang jelas', function () {
+    $this->actingAs($this->admin)->post(route('admin.students.import.store'))
+        ->assertRedirect(route('admin.students.import.index'))
+        ->assertSessionHas('error');
+});
+
+test('berkas bukan CSV ditolak', function () {
+    $this->actingAs($this->admin)->post(route('admin.students.import.preview'), [
+        'file' => UploadedFile::fake()->create('data.pdf', 10, 'application/pdf'),
+    ])->assertSessionHasErrors('file');
+});
+
+test('berkas tanpa kolom wajib dilaporkan sebagai masalah berkas', function () {
+    $this->actingAs($this->admin)->post(route('admin.students.import.preview'), [
+        'file' => UploadedFile::fake()->createWithContent('salah.csv', "nim;nama\n2401001;Budi\n"),
+    ])->assertOk()->assertSee('Kolom berikut tidak ditemukan');
+});
+
+test('tombol Impor CSV muncul di halaman mahasiswa', function () {
+    $this->actingAs($this->admin)->get(route('admin.students.index'))
+        ->assertOk()->assertSee(route('admin.students.import.index'), escape: false);
 });

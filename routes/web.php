@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EvaluationQuestionController;
 use App\Http\Controllers\Admin\LecturerController;
 use App\Http\Controllers\Admin\SemesterPromotionController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StudentImportController;
 use App\Http\Controllers\Admin\StudyProgramController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Kaprodi\DashboardController as KaprodiDashboardController;
@@ -44,6 +45,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('evaluation-questions', EvaluationQuestionController::class)->except('show');
     Route::resource('class-groups', ClassGroupController::class)->except('show');
     Route::resource('lecturers', LecturerController::class)->except('show');
+    // Didaftarkan sebelum resource students supaya "import" tidak tertangkap
+    // sebagai {student} oleh route students/{student}/edit dan sejenisnya.
+    Route::get('students/import', [StudentImportController::class, 'index'])->name('students.import.index');
+    Route::get('students/import/template', [StudentImportController::class, 'template'])->name('students.import.template');
+    Route::post('students/import/preview', [StudentImportController::class, 'preview'])->name('students.import.preview');
+    Route::post('students/import', [StudentImportController::class, 'store'])->name('students.import.store');
     Route::resource('students', StudentController::class)->except('show');
     Route::get('alumni', [AlumniController::class, 'index'])->name('alumni.index');
     Route::resource('evaluation-periods', EvaluationPeriodController::class)->except('show');
