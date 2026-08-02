@@ -11,15 +11,17 @@ use App\Models\EvaluationPeriod;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\StudyProgram;
+use App\Services\EvaluationProgressService;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(EvaluationProgressService $progress): View
     {
         $openPeriod = EvaluationPeriod::open()->first();
 
         return view('admin.dashboard', [
+            'classProgress' => $progress->forPeriod($openPeriod),
             'studyProgramCount' => StudyProgram::count(),
             'lecturerCount' => Lecturer::count(),
             'activeStudentCount' => Student::where('status', StudentStatus::Aktif)->count(),

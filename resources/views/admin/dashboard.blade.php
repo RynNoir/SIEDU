@@ -54,4 +54,61 @@
             </p>
         @endif
     </x-card>
+
+    {{-- Progres per kelas: hanya relevan selama ada periode berjalan, karena
+         gunanya untuk menagih kelas yang tertinggal sebelum periode ditutup. --}}
+    @if ($openPeriod)
+        <x-card class="mt-4">
+            <div class="mb-4">
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-muted">Progres Pengisian per Kelas</h2>
+                <p class="mt-1 text-sm text-muted">
+                    Diurutkan dari yang terendah. <span class="font-medium text-ink">Selesai</span> dihitung dari
+                    mahasiswa yang sudah mengisi seluruh mata kuliahnya.
+                </p>
+            </div>
+
+            @if (empty($classProgress))
+                <x-empty-state message="Belum ada penugasan dosen pada periode ini, jadi belum ada yang bisa dievaluasi mahasiswa." />
+            @else
+                <x-table>
+                    <x-slot name="head">
+                        <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Kelas</th>
+                        <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Prodi</th>
+                        <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Selesai</th>
+                        <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Evaluasi</th>
+                        <th class="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">Progres</th>
+                    </x-slot>
+
+                    @foreach ($classProgress as $row)
+                        @php
+                            $tone = match (true) {
+                                $row['percentage'] >= 80 => 'bg-success',
+                                $row['percentage'] >= 40 => 'bg-warning',
+                                default => 'bg-danger',
+                            };
+                        @endphp
+                        <tr class="hover:bg-accent-soft">
+                            <td class="px-4 py-3 font-mono text-ink">{{ $row['class_code'] }}</td>
+                            <td class="px-4 py-3 font-mono text-muted">{{ $row['study_program'] }}</td>
+                            <td class="px-4 py-3 text-muted">
+                                <span class="text-ink">{{ $row['completed'] }}</span> / {{ $row['students'] }} mhs
+                            </td>
+                            <td class="px-4 py-3 text-muted">
+                                <span class="text-ink">{{ $row['submitted'] }}</span> / {{ $row['expected'] }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-2 w-24 shrink-0 overflow-hidden rounded-full bg-border">
+                                        <div class="h-full rounded-full {{ $tone }} transition-[width] duration-300 ease-out-quart"
+                                            style="width: {{ $row['percentage'] }}%"></div>
+                                    </div>
+                                    <span class="font-mono text-xs text-muted">{{ rtrim(rtrim(number_format($row['percentage'], 1, ',', ''), '0'), ',') }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </x-table>
+            @endif
+        </x-card>
+    @endif
 </x-admin-layout>

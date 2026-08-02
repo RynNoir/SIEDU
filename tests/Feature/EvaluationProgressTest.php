@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PeriodStatus;
 use App\Enums\StudentStatus;
 use App\Models\ClassGroup;
 use App\Models\CourseClassAssignment;
@@ -7,6 +8,7 @@ use App\Models\Evaluation;
 use App\Models\EvaluationPeriod;
 use App\Models\Student;
 use App\Models\StudyProgram;
+use App\Models\User;
 use App\Services\EvaluationProgressService;
 use Illuminate\Support\Collection;
 
@@ -147,6 +149,30 @@ test('kelas tanpa penugasan pada periode ini tidak ikut dilaporkan', function ()
     ClassGroup::factory()->create(['study_program_id' => $this->prodi->id, 'class_code' => 'MI1B']);
 
     expect(array_column($this->service->forPeriod($this->period), 'class_code'))->toBe(['MI1A']);
+});
+
+test('dashboard admin menampilkan progres kelas dengan yang terendah lebih dulu', function () {
+    $admin = User::factory()->admin()->create();
+    ['students' => $penuh, 'assignments' => $tugas] = seedClass('MI1A', students: 2, assignments: 1);
+    seedClass('MI1B', students: 2, assignments: 1); // belum ada yang mengisi
+
+    foreach ($penuh as $s) {
+        submitFor($s, $tugas, 1);
+    }
+
+    $response = $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk();
+
+    $response->assertSee('Progres Pengisian per Kelas')
+        ->assertSeeInOrder(['MI1B', 'MI1A']);
+});
+
+test('tabel progres disembunyikan saat tidak ada periode terbuka', function () {
+    $admin = User::factory()->admin()->create();
+    $this->period->update(['status' => PeriodStatus::Closed]);
+    seedClass('MI1A', students: 2, assignments: 1);
+
+    $this->actingAs($admin)->get(route('admin.dashboard'))
+        ->assertOk()->assertDontSee('Progres Pengisian per Kelas');
 });
 
 test('evaluasi dari periode lain tidak ikut terhitung', function () {
