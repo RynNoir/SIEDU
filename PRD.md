@@ -316,7 +316,7 @@ Contoh satu siklus penuh D3 (6 semester) untuk kohort `MI...A`:
 ### 6.2 Alur Kerja Admin (Rutin)
 
 1. **Setup awal** (jarang berubah): input `study_programs`, `courses` (kurikulum paket per prodi per semester).
-2. **Tiap akhir periode**: tutup periode evaluasi, lalu jalankan proses promosi semester (6.1). Khusus di pergantian genap → ganjil, ini sekaligus menaikkan kelas — di titik itu admin juga membuat `class_groups` untuk mahasiswa baru (tahun 1) dan akun mahasiswa baru beserta `enrollment_year`-nya.
+2. **Tiap akhir periode**: tutup periode evaluasi, lalu jalankan proses promosi semester (6.1). Khusus di pergantian genap → ganjil, ini sekaligus menaikkan kelas — di titik itu admin juga membuat `class_groups` untuk mahasiswa baru (tahun 1) dan akun mahasiswa baru beserta `enrollment_year`-nya, umumnya lewat impor massal (§6.7).
 3. **Tiap periode/semester**: assign dosen ke `course_class_assignments` untuk kombinasi mata kuliah + kelas yang aktif pada periode tersebut — ini yang paling sering berubah. **[REVISI]** Admin dapat menambahkan **lebih dari satu dosen** untuk mata kuliah yang sama di kelas yang sama (team teaching) dengan cukup membuat baris tambahan di `course_class_assignments` dengan `lecturer_id` berbeda.
 4. **Kelola periode evaluasi**: buka (`status = 'open'`) dan tutup (`status = 'closed'`) periode evaluasi. **[REVISI v1.2]** Periode evaluasi bersifat **tunggal** — hanya boleh ada satu `evaluation_periods` berstatus `open` pada satu waktu. Saat admin membuka periode baru, sistem otomatis menutup (`status = 'closed'`) periode `open` yang masih berjalan.
 
@@ -368,6 +368,30 @@ Dua bentuk:
 - File mengikuti filter yang sedang aktif di dashboard, sehingga isinya selalu sama dengan yang dilihat pengguna saat menekan unduh.
 
 Format CSV dipilih karena tidak menambah dependency dan langsung terbaca Excel. Berkasnya memakai BOM UTF-8, pemisah titik koma, dan desimal koma agar terbuka benar di Excel berlokal Indonesia tanpa wizard impor.
+
+### 6.7 Impor Massal Mahasiswa (CSV) **[v1.6]**
+
+Admin dapat menambah banyak mahasiswa sekaligus dari satu berkas CSV, lewat **Mahasiswa → Impor CSV**. Sebelumnya akun dibuat satu per satu lewat form berisi 8 isian — untuk satu angkatan baru (±150–200 orang) itu ribuan pengetikan manual atas data yang sebenarnya sudah tersedia rapi di sistem akademik.
+
+**Kolom berkas** (baris judul kolom wajib ada, urutan bebas):
+
+```
+nim ; nama ; email ; kode_prodi ; kode_kelas ; angkatan ; semester ; status
+```
+
+Prodi dan kelas dirujuk lewat **kode** (`MI`, `MI1A`), bukan ID database — itu yang tersedia di spreadsheet admin. Kolom `status` boleh dikosongkan, dianggap `aktif`. Kelas ditulis **per baris**, sehingga satu berkas bisa memuat seluruh angkatan lintas prodi sekaligus.
+
+**Alur tiga langkah**: unduh template → unggah berkas → **pratinjau** → konfirmasi. Pratinjau bersifat read-only dan menampilkan setiap baris beserta alasan penolakannya. Tanpa langkah ini, berkas 200 baris yang punya satu kesalahan hanya menghasilkan satu pesan "gagal" tanpa petunjuk baris mana yang bermasalah.
+
+**Aturan validasi:**
+
+1. Aturan per-baris **sama persis dengan form manual** — diambil dari `StudentRequest::rulesFor()` dan `classConsistencyErrors()`, bukan ditulis ulang, agar kedua jalur tidak bisa menerima data yang berbeda.
+2. Kode prodi/kelas yang tak dikenal ditolak dengan menyebut kodenya, bukan nama kolom database.
+3. **Duplikat di dalam berkas itu sendiri** ikut diperiksa (NIM & email). Aturan `unique` hanya melihat database, sehingga dua baris ber-NIM sama akan sama-sama lolos lalu menabrak saat penyimpanan — kasus yang lumrah terjadi karena salin-tempel antar sheet. Nilai baru "diklaim" bila barisnya lolos seutuhnya, supaya baris yang toh akan ditolak tidak mengunci NIM milik baris lain yang benar.
+
+**Perilaku penyimpanan:** hanya baris valid yang tersimpan, baris bermasalah dilewati dan dilaporkan jumlahnya. Seluruh penyimpanan berada dalam satu transaction. Berkas diperiksa ulang dari nol saat konfirmasi, tidak memercayai hasil pratinjau, karena isi database bisa berubah di antara kedua langkah.
+
+**Akun yang dibuat** mengikuti jalur yang sama dengan pembuatan manual: password default dari `config('evaluation.default_password')` dan `must_change_password = true`.
 
 ---
 
