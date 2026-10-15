@@ -1,58 +1,261 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIEDU — Sistem Evaluasi Dosen Terpadu
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk mengelola evaluasi dosen oleh mahasiswa di **Jurusan Teknologi Informasi, Politeknik Negeri Padang**. SIEDU menggantikan pengisian evaluasi lewat formulir manual/Google Form dengan sistem terstruktur yang menjaga anonimitas mahasiswa sekaligus memberi dosen dan kaprodi hasil yang bisa dianalisis per kategori.
 
-## About Laravel
+Setiap evaluasi terdiri dari dua bagian:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. **Kuesioner terstruktur** — pertanyaan berskala bintang 1–5 yang seragam, dikelompokkan per kategori (penguasaan materi, interaksi, kedisiplinan, penilaian & feedback, rangkuman keseluruhan).
+2. **Kesan & Saran** — teks bebas yang ditampilkan ke dosen secara **anonim**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Daftar Isi
 
-## Learning Laravel
+- [Fitur](#fitur)
+- [Peran Pengguna](#peran-pengguna)
+- [Konsep Akademik](#konsep-akademik)
+- [Anonimitas & Keamanan](#anonimitas--keamanan)
+- [Tech Stack](#tech-stack)
+- [Instalasi](#instalasi)
+- [Akun Demo](#akun-demo)
+- [Perintah Penting](#perintah-penting)
+- [Konfigurasi](#konfigurasi)
+- [Struktur Project](#struktur-project)
+- [Testing](#testing)
+- [Dokumentasi Lanjutan](#dokumentasi-lanjutan)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Fitur
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Admin
+- **Master data**: program studi, kelas, mata kuliah (kurikulum paket), pertanyaan kuesioner, akun dosen & mahasiswa.
+- **Penugasan dosen** ke kombinasi mata kuliah + kelas + periode, termasuk **team teaching** (satu mata kuliah diampu lebih dari satu dosen).
+- **Periode evaluasi** berstatus `draft` → `open` → `closed`. Hanya satu periode yang boleh dibuka; membuka periode baru otomatis menutup periode sebelumnya.
+- **Impor massal mahasiswa via CSV** dengan alur unduh template → unggah → pratinjau per baris (lengkap dengan alasan penolakan) → konfirmasi.
+- **Promosi semester** per periode dengan pratinjau (dry-run) sebelum dieksekusi. Diblokir selama masih ada periode evaluasi yang dibuka.
+- **Halaman Alumni** terpisah untuk mahasiswa yang sudah lulus.
+- **Pemantauan progres pengisian** per kelas di dashboard, diurutkan dari yang terendah, supaya admin tahu kelas mana yang perlu diingatkan.
 
-## Agentic Development
+### Mahasiswa
+- Melihat daftar evaluasi yang wajib diisi berdasarkan kelas dan periode aktif.
+- Mengisi kuesioner bintang + kesan & saran untuk setiap pasangan mata kuliah–dosen. Mata kuliah team teaching muncul sebagai form terpisah per dosen.
+- Submit ganda dicegah di tingkat database.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Dosen
+- Dashboard hasil evaluasi untuk mata kuliah yang diampu: skor rata-rata per kategori, tingkat partisipasi, dan kesan & saran anonim.
+- Filter per kelas, per periode, dan per rentang rating.
+- **Ekspor CSV**: rekap seluruh kelas yang diampu atau detail satu penugasan.
+
+### Kaprodi
+- Dashboard agregasi tingkat program studi, otomatis terkunci ke prodi milik akunnya.
+- Membandingkan skor antar dosen di kelas paralel (adil karena kurikulumnya identik).
+- Ekspor CSV rekap prodi untuk laporan ke jurusan.
+
+---
+
+## Peran Pengguna
+
+| Role | Akses | Dibuat oleh |
+|---|---|---|
+| `admin` | Seluruh master data, penugasan, periode, promosi semester | Seeder |
+| `lecturer` | Hasil evaluasi mata kuliah yang diampu | Admin |
+| `student` | Mengisi evaluasi pada periode aktif | Admin |
+| `kaprodi` | Agregasi hasil evaluasi satu program studi | Admin |
+
+Tidak ada pendaftaran mandiri. Semua akun dibuat admin dengan password default dan **wajib diganti saat login pertama**.
+
+---
+
+## Konsep Akademik
+
+**Program studi** yang didukung:
+
+| Kode | Program Studi | Jenjang | Semester |
+|---|---|---|---|
+| MI | Manajemen Informatika | D3 | 6 |
+| TK | Teknik Komputer | D3 | 6 |
+| SI | Sistem Informasi | D3 | 6 |
+| TRPL | Teknologi Rekayasa Perangkat Lunak | D4 | 8 |
+| ANIM | Animasi | D4 | 8 |
+
+- **Penamaan kelas**: `{KODE_PRODI}{TAHUN_KE}{HURUF}`, misalnya `MI1A` atau `TRPL3B`, dengan `tahun = ceil(semester / 2)`.
+- **Kelas sebagai kohort**: mahasiswa naik tingkat bersama (`MI1B` → `MI2B` → `MI3B`). Kohort diidentifikasi oleh pasangan angkatan (`enrollment_year`) + huruf kelas.
+- **Kurikulum paket**: mata kuliah ditetapkan per prodi per semester, jadi tidak ada tabel KRS/enrollment. Yang berubah tiap periode hanya dosen pengampunya.
+- **Promosi semester**: dijalankan sekali tiap akhir periode dan menaikkan mahasiswa aktif satu semester. Pada pergantian genap → ganjil, mahasiswa juga pindah ke kelas tingkat berikutnya. Mahasiswa yang menuntaskan semester terakhir otomatis berstatus `lulus`. Prosesnya idempoten karena memfilter berdasarkan paritas semester tiap mahasiswa.
+- **Status mahasiswa**: `aktif`, `cuti`, `DO`, `lulus`. Hanya mahasiswa aktif yang ikut promosi dan dihitung dalam progres pengisian.
+
+---
+
+## Anonimitas & Keamanan
+
+- `student_id` **tidak pernah** diekspos ke halaman maupun file unduhan dosen dan kaprodi.
+- Kesan & saran baru ditampilkan setelah jumlah responden per penugasan mencapai **ambang minimum** (default 5, dapat dikonfigurasi). Aturan ini juga berlaku pada file ekspor CSV.
+- Tidak tersedia filter granular yang bisa dipakai untuk mengidentifikasi individu.
+- Otorisasi berbasis role lewat middleware `role:*` dan policy untuk akses penugasan.
+- Middleware `EnsurePasswordChanged` memaksa pengguna mengganti password default.
+- Kolom `created_by` pada mahasiswa dan penugasan dosen sebagai audit trail.
+
+---
+
+## Tech Stack
+
+| Lapisan | Teknologi |
+|---|---|
+| Backend | PHP 8.3+ (dikembangkan di 8.5), Laravel 13 |
+| Database | MySQL / MariaDB |
+| Autentikasi | Laravel Breeze (Blade), dikustomisasi untuk 4 role |
+| Frontend | Blade, Tailwind CSS v4, Alpine.js, htmx |
+| Build tool | Vite |
+| Testing | Pest v4 |
+| Code style | Laravel Pint |
+
+Grafik dan meter skor dibuat dengan SVG/CSS tanpa library chart tambahan. Ekspor dan impor memakai CSV (BOM UTF-8, pemisah titik koma, desimal koma) agar langsung terbaca Excel berlokal Indonesia tanpa dependency tambahan.
+
+---
+
+## Instalasi
+
+### Prasyarat
+- PHP 8.3 atau lebih baru beserta ekstensi standar Laravel
+- Composer
+- Node.js & npm
+- MySQL atau MariaDB
+
+### Langkah
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone repository
+git clone https://github.com/RynNoir/SIEDU.git
+cd SIEDU
 
-php artisan boost:install
+# 2. Install dependency & siapkan .env
+composer install
+cp .env.example .env
+php artisan key:generate
+
+# 3. Buat database bernama "siedu", lalu sesuaikan DB_* di .env
+
+# 4. Migrasi + data contoh
+php artisan migrate --seed
+
+# 5. Build aset frontend
+npm install
+npm run build
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Jalankan server pengembangan (web server, queue worker, dan Vite sekaligus):
 
-## Contributing
+```bash
+composer run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Aplikasi dapat diakses di `http://localhost:8000`.
 
-## Code of Conduct
+> Alternatif cepat: `composer run setup` menjalankan install dependency, membuat `.env`, generate key, migrasi, dan build aset dalam satu perintah (tanpa seeder).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Akun Demo
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Setelah `php artisan migrate --seed`, tersedia data contoh: 5 prodi, kelas, kurikulum, 4 dosen per prodi, 25 mahasiswa per kelas, pertanyaan kuesioner, satu periode historis (closed), satu periode aktif (open), penugasan dosen, dan contoh evaluasi.
 
-## License
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@siedu.test` | `password` |
+| Kaprodi | `kaprodi.mi@siedu.test`, `kaprodi.tk@siedu.test`, `kaprodi.si@siedu.test`, `kaprodi.trpl@siedu.test`, `kaprodi.anim@siedu.test` | `password` |
+| Dosen & Mahasiswa | Dibuat acak oleh seeder; lihat emailnya di menu **Dosen** / **Mahasiswa** pada panel admin | `password` |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Akun kaprodi akan diminta mengganti password pada login pertama.
+
+---
+
+## Perintah Penting
+
+```bash
+# Promosi semester lewat CLI (padanan halaman Promosi Semester di panel admin)
+php artisan semester:promote 2025/2026 ganjil
+php artisan semester:promote 2025/2026 genap
+
+# Tembus blokir periode yang masih dibuka (untuk keperluan pemulihan)
+php artisan semester:promote 2025/2026 genap --force
+
+# Format kode
+vendor/bin/pint
+```
+
+---
+
+## Konfigurasi
+
+Selain variabel standar Laravel, SIEDU memakai pengaturan di [config/evaluation.php](config/evaluation.php):
+
+| Variabel `.env` | Default | Keterangan |
+|---|---|---|
+| `EVALUATION_ANONYMITY_MIN_RESPONDENTS` | `5` | Minimum responden sebelum kesan & saran ditampilkan ke dosen/kaprodi |
+| `EVALUATION_DEFAULT_PASSWORD` | `password` | Password default akun yang dibuat admin |
+
+---
+
+## Struktur Project
+
+```
+app/
+├── Console/Commands/      # semester:promote
+├── Enums/                 # Role, StudentStatus, PeriodStatus, SemesterType, DegreeLevel
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/         # Master data, penugasan, periode, impor, promosi, alumni
+│   │   ├── Lecturer/      # Dashboard & ekspor dosen
+│   │   ├── Kaprodi/       # Dashboard & ekspor kaprodi
+│   │   └── Student/       # Pengisian evaluasi
+│   ├── Middleware/        # EnsureUserHasRole, EnsurePasswordChanged
+│   └── Requests/          # Form request validation
+├── Models/                # 12 model Eloquent
+├── Policies/              # Otorisasi akses penugasan
+└── Services/              # Logika bisnis
+    ├── AssignmentResultService.php     # Skor per kategori + ambang anonimitas
+    ├── EvaluationProgressService.php   # Progres pengisian per kelas
+    ├── EvaluationExportService.php     # Ekspor rekap & detail
+    ├── SemesterPromotionService.php    # Promosi semester & kelulusan
+    ├── StudentImportService.php        # Impor massal mahasiswa
+    ├── CsvExportService.php
+    └── CsvImportService.php
+resources/views/
+├── admin/  lecturer/  kaprodi/  student/   # Halaman per role
+└── components/                             # Komponen Blade (layout, tabel, chart, badge, dll.)
+```
+
+### Skema Database
+
+12 tabel inti: `study_programs`, `class_groups`, `courses`, `lecturers`, `students`, `users`, `evaluation_periods`, `evaluation_questions`, `course_class_assignments`, `evaluations`, `evaluation_answers`, `evaluation_impressions`.
+
+Constraint penting:
+- `course_class_assignments` unik pada (`course_id`, `lecturer_id`, `class_group_id`, `evaluation_period_id`), sehingga team teaching tetap bisa dilakukan.
+- `evaluations` unik pada (`student_id`, `course_class_assignment_id`, `evaluation_period_id`) untuk mencegah submit ganda.
+
+Validasi bisnis tambahan: semester mata kuliah harus cocok dengan tingkat kelas, semester 7–8 hanya untuk prodi D4, dan paritas semester mata kuliah (ganjil/genap) harus sesuai dengan tipe periode evaluasi.
+
+---
+
+## Testing
+
+```bash
+php artisan test
+```
+
+Test suite (Pest) mencakup autentikasi, akses per role, CRUD admin, penugasan dosen, pengisian evaluasi, ambang anonimitas, ekspor dan impor CSV, promosi semester, progres pengisian, integritas penghapusan data, keamanan, serta alur end-to-end.
+
+---
+
+## Dokumentasi Lanjutan
+
+- [PRD.md](PRD.md) — kebutuhan produk, skema database, business logic, dan riwayat revisi
+- [GUIDELINE.md](GUIDELINE.md) — panduan desain antarmuka (warna, tipografi, komponen)
+- [TODO.md](TODO.md) — rencana dan status pengembangan per fase
+
+---
+
+## Lisensi
+
+Dirilis di bawah lisensi [MIT](https://opensource.org/licenses/MIT).
